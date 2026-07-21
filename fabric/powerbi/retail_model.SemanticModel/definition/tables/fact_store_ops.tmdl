@@ -1,6 +1,6 @@
 table fact_store_ops
 	lineageTag: 30e435c0-c71d-474c-b807-e2f634dbf383
-	sourceLineageTag: [ag].[fact_store_ops]
+	sourceLineageTag: [silver].[fact_store_ops]
 
 	/// Count of store operation events.
 	measure 'Store Operation Events' = COUNTROWS('fact_store_ops')
@@ -63,6 +63,6 @@ table fact_store_ops
 		mode: directLake
 		source
 			entityName: fact_store_ops
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

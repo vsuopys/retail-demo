@@ -1,6 +1,6 @@
 table fact_ble_pings
 	lineageTag: 73ae8b40-2387-4123-859d-f4e85a159c5b
-	sourceLineageTag: [ag].[fact_ble_pings]
+	sourceLineageTag: [silver].[fact_ble_pings]
 
 	column 'Beacon ID'
 		dataType: string
@@ -86,6 +86,6 @@ table fact_ble_pings
 		mode: directLake
 		source
 			entityName: fact_ble_pings
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

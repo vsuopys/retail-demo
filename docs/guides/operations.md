@@ -13,7 +13,7 @@ Before a demo:
    deployment run.
 2. Confirm required Fabric items and KQL objects exist in that workspace.
 3. Confirm setup notebooks or `setup-pipeline` completed successfully.
-4. Confirm expected `ag` and `au` tables are populated.
+4. Confirm expected `silver` and `gold` tables are populated.
 5. Confirm the semantic model is bound to the intended Lakehouse.
 6. Confirm optional ML, ontology, agent, dashboard, and rule surfaces are ready
    before including them.
@@ -37,7 +37,7 @@ Use Fabric Monitoring Hub and item run histories for pipelines and notebooks.
 Correlate them with:
 
 - `setup_run_log` for historical setup;
-- `ag._watermarks` for streaming-to-Silver progress;
+- `silver._watermarks` for streaming-to-Silver progress;
 - Eventhouse ingestion timestamps and row counts;
 - Gold refresh timestamps or representative max event time;
 - model/run identifiers for optional predictive output;
@@ -91,7 +91,7 @@ rather than ingestion time.
 | Setup pipeline failed | Resume from the first failed activity only after validating upstream tables. |
 | Ontology/task-flow links missing | Complete ontology creation, then redeploy the task flow and dependent agent. |
 | Live rows absent | Verify notebook parameters, resolved Query URI, KQL permissions, connector errors, and ingestion timestamps. |
-| Silver data stale | Inspect Eventhouse shortcuts, transform run history, source timestamps, and `ag._watermarks`. |
+| Silver data stale | Inspect Eventhouse shortcuts, transform run history, source timestamps, and `silver._watermarks`. |
 | Gold data stale | Confirm the Silver run completed, then run the Gold transform. |
 | Power BI errors | Confirm required tables exist and the Direct Lake binding targets the correct Lakehouse. |
 | Local validation passed but live assets fail | Treat the deploy as not ready and perform item, binding, KQL, run, and data checks. |

@@ -1,6 +1,6 @@
 table churn_predictions
 	lineageTag: c5e6e000-0000-0000-0002-000000000000
-	sourceLineageTag: [au].[churn_predictions]
+	sourceLineageTag: [gold].[churn_predictions]
 
 	/// Customers flagged as likely to churn by the model.
 	measure 'Customers At Risk' = CALCULATE(DISTINCTCOUNT('churn_predictions'[Customer ID]), 'churn_predictions'[Churn Prediction] = 1)
@@ -108,6 +108,6 @@ table churn_predictions
 		mode: directLake
 		source
 			entityName: churn_predictions
-			schemaName: au
+			schemaName: gold
 			expressionSource: 'DirectLake - retail_lakehouse'
 

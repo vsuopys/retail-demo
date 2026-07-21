@@ -1,6 +1,6 @@
 table dim_customers
 	lineageTag: 5531b22c-bc78-4ae9-8d9f-64dcee879bad
-	sourceLineageTag: [ag].[dim_customers]
+	sourceLineageTag: [silver].[dim_customers]
 
 	measure '# of Customers' = COUNTROWS(dim_customers)
 		formatString: #,0
@@ -107,6 +107,6 @@ table dim_customers
 		mode: directLake
 		source
 			entityName: dim_customers
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

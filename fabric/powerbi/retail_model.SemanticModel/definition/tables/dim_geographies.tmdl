@@ -1,6 +1,6 @@
 table dim_geographies
 	lineageTag: 0182aad6-4ad2-40ca-ad96-bccd64f82380
-	sourceLineageTag: [ag].[dim_geographies]
+	sourceLineageTag: [silver].[dim_geographies]
 
 	measure '# of Locations' = COUNTROWS(dim_geographies)
 		formatString: #,0
@@ -88,6 +88,6 @@ table dim_geographies
 		mode: directLake
 		source
 			entityName: dim_geographies
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

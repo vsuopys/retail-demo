@@ -350,7 +350,7 @@ TABLES: dict[str, list[tuple[str, str]]] = {
         ("__index_level_0__", "long"),
     ],
     # -----------------------------------------------------------------------
-    # Plan 2c: 9 Gold (au) aggregate tables
+    # Plan 2c: 9 Gold (gold) aggregate tables
     # TMDL audit 2026-06-12: bindings match exactly; `computed_at` and `as_of`
     # are produced by the legacy transforms but unbound in TMDL (extras OK).
     # TMDL `day`/`ts` are dateTime — TYPE_COMPAT accepts timestamp|date.

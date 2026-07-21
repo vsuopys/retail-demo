@@ -1,6 +1,6 @@
 table fact_customer_zone_changes
 	lineageTag: edc61f90-5ee8-4618-9d9d-e496d674f557
-	sourceLineageTag: [ag].[fact_customer_zone_changes]
+	sourceLineageTag: [silver].[fact_customer_zone_changes]
 
 	column 'Store ID'
 		dataType: int64
@@ -61,6 +61,6 @@ table fact_customer_zone_changes
 		mode: directLake
 		source
 			entityName: fact_customer_zone_changes
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

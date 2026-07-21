@@ -1,6 +1,6 @@
 table demand_forecast
 	lineageTag: c5e6e000-0000-0000-0004-000000000000
-	sourceLineageTag: [au].[demand_forecast]
+	sourceLineageTag: [gold].[demand_forecast]
 
 	/// Total predicted units across the in-context store/product/horizon.
 	measure 'Forecasted Units' = SUM('demand_forecast'[Predicted Units])
@@ -110,6 +110,6 @@ table demand_forecast
 		mode: directLake
 		source
 			entityName: demand_forecast
-			schemaName: au
+			schemaName: gold
 			expressionSource: 'DirectLake - retail_lakehouse'
 

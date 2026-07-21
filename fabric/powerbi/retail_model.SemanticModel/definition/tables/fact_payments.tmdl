@@ -1,6 +1,6 @@
 table fact_payments
 	lineageTag: a9ee5779-cb04-439d-8691-5ae9eb849b4e
-	sourceLineageTag: [ag].[fact_payments]
+	sourceLineageTag: [silver].[fact_payments]
 
 	/// Total payment amount, stored in cents and reported in currency.
 	measure 'Total Amounts' = DIVIDE(SUM('fact_payments'[Amount Cents]), 100, 0)
@@ -187,6 +187,6 @@ table fact_payments
 		mode: directLake
 		source
 			entityName: fact_payments
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

@@ -1,6 +1,6 @@
 table fact_foot_traffic
 	lineageTag: c999b61a-43db-4db3-9783-626a4618f864
-	sourceLineageTag: [ag].[fact_foot_traffic]
+	sourceLineageTag: [silver].[fact_foot_traffic]
 
 	/// Total observed in-store foot traffic count.
 	measure 'Foot Traffic Count' = SUM('fact_foot_traffic'[Count])
@@ -93,6 +93,6 @@ table fact_foot_traffic
 		mode: directLake
 		source
 			entityName: fact_foot_traffic
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

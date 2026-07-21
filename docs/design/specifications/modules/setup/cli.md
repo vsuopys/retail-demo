@@ -55,8 +55,8 @@ operation without a partial output set.
 | Token | Meaning |
 | --- | --- |
 | `LAKEHOUSE_NAME` | Target Lakehouse display name |
-| `SILVER_DB` | Silver schema, normally `ag` |
-| `GOLD_DB` | Gold schema, normally `au` |
+| `SILVER_DB` | Silver schema, normally `silver` |
+| `GOLD_DB` | Gold schema, normally `gold` |
 | `STORE_TYPE` | Dictionary/profile |
 | `START_DATE` | Derived or explicit historical start |
 | `END_DATE` | Derived or explicit historical end |

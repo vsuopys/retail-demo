@@ -1,6 +1,6 @@
 table fact_store_inventory_txn
 	lineageTag: 069e006d-82a8-46ab-abf7-39d781c37887
-	sourceLineageTag: [ag].[fact_store_inventory_txn]
+	sourceLineageTag: [silver].[fact_store_inventory_txn]
 
 	measure 'Total Inventory Transactions' = COUNTROWS('fact_store_inventory_txn')
 		formatString: #,0
@@ -94,6 +94,6 @@ table fact_store_inventory_txn
 		mode: directLake
 		source
 			entityName: fact_store_inventory_txn
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

@@ -33,8 +33,8 @@ mappings.
 | Layer | Schema/location | Role |
 | --- | --- | --- |
 | Live Bronze | `cusn` shortcuts | Eventhouse tables exposed to Spark |
-| Silver | `ag` | Typed dimensions, facts, and operational state |
-| Gold | `au` | Nine reporting aggregates and optional ML outputs |
+| Silver | `silver` | Typed dimensions, facts, and operational state |
+| Gold | `gold` | Nine reporting aggregates and optional ML outputs |
 
 The primary historical path writes Silver/Gold directly through setup notebooks.
 The Eventhouse shortcut path is optional for incremental live projection.
@@ -42,7 +42,7 @@ The Eventhouse shortcut path is optional for incremental live projection.
 ## Streaming-to-Silver behavior
 
 `03-streaming-to-silver.ipynb` reads Eventhouse shortcuts, filters by per-source
-watermarks in `ag._watermarks`, appends transformed output, then advances the
+watermarks in `silver._watermarks`, appends transformed output, then advances the
 watermark.
 
 Truck arrival/departure is handled as one lifecycle: Silver joins the two
@@ -56,7 +56,7 @@ Known divergences:
 
 - `inventory_updated` populates store inventory transactions with incomplete
   current-balance semantics;
-- picked and shipped events populate `ag.fact_online_order_status`;
+- picked and shipped events populate `silver.fact_online_order_status`;
 - `fact_online_order_status` is not in `schemas.py` or the active semantic
   model;
 - live coverage is not equivalent for every historical fact.

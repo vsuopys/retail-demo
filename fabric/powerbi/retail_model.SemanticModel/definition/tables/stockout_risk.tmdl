@@ -1,6 +1,6 @@
 table stockout_risk
 	lineageTag: c5e6e000-0000-0000-0003-000000000000
-	sourceLineageTag: [au].[stockout_risk]
+	sourceLineageTag: [gold].[stockout_risk]
 
 	/// Distinct store/product combinations flagged by the stockout model.
 	measure 'Stockout Risk SKU Count' = DISTINCTCOUNT('stockout_risk'[Product ID])
@@ -192,6 +192,6 @@ table stockout_risk
 		mode: directLake
 		source
 			entityName: stockout_risk
-			schemaName: au
+			schemaName: gold
 			expressionSource: 'DirectLake - retail_lakehouse'
 

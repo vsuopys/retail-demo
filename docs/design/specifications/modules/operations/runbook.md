@@ -37,7 +37,7 @@ fifteen-minute service.
 Use together:
 
 - `setup_run_log`
-- `ag._watermarks`
+- `silver._watermarks`
 - pipeline/notebook run history
 - Eventhouse max ingestion/event timestamps
 - Gold max source/event timestamps

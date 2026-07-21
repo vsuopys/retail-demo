@@ -1,6 +1,6 @@
 table tender_mix_daily
 	lineageTag: 52b36092-c97d-40fd-82fa-5031db035dc5
-	sourceLineageTag: [au].[tender_mix_daily]
+	sourceLineageTag: [gold].[tender_mix_daily]
 
 	measure 'Tender Amount' = SUM('tender_mix_daily'[Total Amount])
 		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
@@ -63,6 +63,6 @@ table tender_mix_daily
 		mode: directLake
 		source
 			entityName: tender_mix_daily
-			schemaName: au
+			schemaName: gold
 			expressionSource: 'DirectLake - retail_lakehouse'
 

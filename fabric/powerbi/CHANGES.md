@@ -8,7 +8,7 @@ This update adds a date dimension to the Silver layer and fixes ID type mismatch
 
 ### 1. New Date Dimension (`dim_date`)
 
-**Location**: `ag.dim_date` (Silver layer)
+**Location**: `silver.dim_date` (Silver layer)
 
 **Key**: `date_key` (int64, YYYYMMDD format)
 
@@ -90,24 +90,24 @@ fabric/lakehouse/02-historical-data-load.ipynb
 ```
 
 **Expected outcome**:
-- `ag.dim_date` created with ~700-1000 rows (depends on data range)
+- `silver.dim_date` created with ~700-1000 rows (depends on data range)
 - All dimension and fact tables have corrected ID types
 
 ### Step 2: Verify dim_date Created
 
 ```sql
 -- Check dim_date was created
-SELECT COUNT(*) FROM ag.dim_date;
+SELECT COUNT(*) FROM silver.dim_date;
 
 -- Verify date range
 SELECT
     MIN(date) as min_date,
     MAX(date) as max_date,
     COUNT(*) as total_dates
-FROM ag.dim_date;
+FROM silver.dim_date;
 
 -- Check structure
-SELECT * FROM ag.dim_date LIMIT 10;
+SELECT * FROM silver.dim_date LIMIT 10;
 ```
 
 ### Step 3: Update Semantic Model
@@ -136,15 +136,15 @@ Run these queries to verify type consistency:
 
 ```sql
 -- Check store_id is now long in fact_receipts
-DESCRIBE ag.fact_receipts;
+DESCRIBE silver.fact_receipts;
 
 -- Verify join works without type casting
 SELECT
     r.store_id,
     s.ID as store_id_dim,
     COUNT(*) as receipt_count
-FROM ag.fact_receipts r
-INNER JOIN ag.dim_stores s ON r.store_id = s.ID
+FROM silver.fact_receipts r
+INNER JOIN silver.dim_stores s ON r.store_id = s.ID
 GROUP BY r.store_id, s.ID
 LIMIT 10;
 ```
@@ -187,8 +187,8 @@ max_date = datetime(2025, 12, 31).date()
 
 **Solution**: Drop and recreate Gold tables
 ```sql
-DROP TABLE IF EXISTS au.sales_minute_store;
-DROP TABLE IF EXISTS au.inventory_position_current;
+DROP TABLE IF EXISTS gold.sales_minute_store;
+DROP TABLE IF EXISTS gold.inventory_position_current;
 -- ... repeat for all Gold tables
 
 -- Then re-run:
@@ -202,8 +202,8 @@ fabric/lakehouse/02-historical-data-load.ipynb
 **Solution**: Verify column names in Gold tables
 ```sql
 -- Check column names in Gold daily tables
-DESCRIBE au.online_sales_daily;
-DESCRIBE au.tender_mix_daily;
+DESCRIBE gold.online_sales_daily;
+DESCRIBE gold.tender_mix_daily;
 
 -- Should have a 'day' column of type date
 ```
@@ -218,7 +218,7 @@ git checkout HEAD~1 fabric/lakehouse/02-historical-data-load.ipynb
 git checkout HEAD~1 fabric/lakehouse/03-streaming-to-silver.ipynb
 
 # Drop dim_date
-DROP TABLE IF EXISTS ag.dim_date;
+DROP TABLE IF EXISTS silver.dim_date;
 
 # Restore semantic model
 git checkout HEAD~1 fabric/powerbi/

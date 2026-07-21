@@ -1,6 +1,6 @@
 table fact_receipt_lines
 	lineageTag: aab05dc7-35b4-4318-affd-bc107c21f8f7
-	sourceLineageTag: [ag].[fact_receipt_lines]
+	sourceLineageTag: [silver].[fact_receipt_lines]
 
 	/// Total item units sold in store receipt lines.
 	measure 'Total Units Sold' = SUM('fact_receipt_lines'[Quantity])
@@ -178,6 +178,6 @@ table fact_receipt_lines
 		mode: directLake
 		source
 			entityName: fact_receipt_lines
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

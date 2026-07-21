@@ -58,7 +58,7 @@ def _param(value: str, default: str) -> str:
     return default if len(value) > 1 and value[0] == value[1] == "{" else value
 
 LAKEHOUSE_NAME = _param("{{LAKEHOUSE_NAME}}", "retail_lakehouse")
-SILVER_DB = _param("{{SILVER_DB}}", "ag")
+SILVER_DB = _param("{{SILVER_DB}}", "silver")
 STORE_TYPE = _param("{{STORE_TYPE}}", "supercenter")
 SEED = int(_param("{{SEED}}", "42"))
 
@@ -238,7 +238,13 @@ b0 = (rate.select(ts.alias("ts"), v.alias("v"))
       .withColumn("order_id", F.concat(F.lit("ONL-"), F.col("v").cast("string")))
       .withColumn("shipment_id", F.concat(F.lit("SHP-"), F.col("v").cast("string")))
       .withColumn("session_id", F.concat(F.lit("SES-"), F.col("v").cast("string")))
-      .withColumn("ble_id", F.concat(F.lit("BLE"), F.col("customer_id").cast("string")))
+      .withColumn(
+          "ble_id",
+          F.concat(
+              F.lit("BLE"),
+              F.expr("upper(lpad(conv(customer_id, 10, 36), 6, '0'))"),
+          ),
+      )
       .withColumn("zone", _pick(F.col("v"), "zone", ZONES))
       .withColumn("tender", _pick(F.col("v"), "tender", TENDERS))
       # two real line products (joined to dim_products below for price+tax)
@@ -449,7 +455,7 @@ events_arr = F.array(
         _pick(F.col("v"), "chan", CHANNELS).alias("channel"),
         F.concat(F.lit("CMP-"), (_h(F.col("v"), "camp", 20) + F.lit(1)).cast("string")).alias("campaign_id"),
         F.concat(F.lit("CRV-"), (_h(F.col("v"), "crv", 50) + F.lit(1)).cast("string")).alias("creative_id"),
-        F.concat(F.lit("AD"), _id(F.col("v"), "adcust", CUSTOMER_COUNT).cast("string")).alias("customer_ad_id"),
+        F.format_string("AD%08d", _id(F.col("v"), "adcust", CUSTOMER_COUNT)).alias("customer_ad_id"),
         F.concat(F.lit("IMP-"), F.col("v").cast("string")).alias("impression_id"),
         F.round(_u(F.col("v"), "cost") * F.lit(2.0) + F.lit(0.1), 4).alias("cost"),
         _pick(F.col("v"), "dev", DEVICES).alias("device_type"),
@@ -513,7 +519,7 @@ ENVELOPE = [
 # Per event type: (kusto_column, json_payload_field, datatype). Generated from the
 # KQL ingestion mappings; keep in sync if those change.
 EVENT_PAYLOADS = {
-    "receipt_created": [("store_id", "store_id", "long"), ("customer_id", "customer_id", "long"), ("receipt_id", "receipt_id", "string"), ("subtotal", "subtotal", "real"), ("tax", "tax", "real"), ("total", "total", "real"), ("tender_type", "tender_type", "string"), ("item_count", "item_count", "long")],
+    "receipt_created": [("store_id", "store_id", "long"), ("customer_id", "customer_id", "long"), ("receipt_id", "receipt_id", "string"), ("subtotal", "subtotal", "real"), ("tax", "tax", "real"), ("total", "total", "real"), ("tender_type", "tender_type", "string"), ("item_count", "item_count", "long"), ("campaign_id", "campaign_id", "string")],
     "receipt_line_added": [("receipt_id", "receipt_id", "string"), ("line_number", "line_number", "long"), ("product_id", "product_id", "long"), ("quantity", "quantity", "long"), ("unit_price", "unit_price", "real"), ("extended_price", "extended_price", "real"), ("promo_code", "promo_code", "string")],
     "payment_processed": [("receipt_id", "receipt_id", "string"), ("order_id", "order_id", "string"), ("payment_method", "payment_method", "string"), ("amount", "amount", "real"), ("amount_cents", "amount_cents", "long"), ("transaction_id", "transaction_id", "string"), ("processing_time", "processing_time", "datetime"), ("processing_time_ms", "processing_time_ms", "int"), ("status", "status", "string"), ("decline_reason", "decline_reason", "string"), ("store_id", "store_id", "long"), ("customer_id", "customer_id", "long")],
     "inventory_updated": [("store_id", "store_id", "long"), ("dc_id", "dc_id", "long"), ("product_id", "product_id", "long"), ("quantity_delta", "quantity_delta", "long"), ("reason", "reason", "string"), ("payload_source", "source", "string")],
@@ -559,16 +565,16 @@ def _from_json_schema(event_type):
 def _kusto_columns(event_type):
     """Project a parsed-envelope frame to the target KQL table's exact columns."""
     cols = []
-    for name, dt in ENVELOPE:
-        c = F.col(name)
-        if dt == "datetime":
-            c = F.to_timestamp(c, _ISO_FMT)
-        cols.append(c.alias(name))
     for col, jf, dt in EVENT_PAYLOADS[event_type]:
         c = F.col("payload").getField(jf)
         if dt == "datetime":
             c = F.to_timestamp(c, _ISO_FMT)
         cols.append(c.alias(col))
+    for name, dt in ENVELOPE:
+        c = F.col(name)
+        if dt == "datetime":
+            c = F.to_timestamp(c, _ISO_FMT)
+        cols.append(c.alias(name))
     return cols
 
 

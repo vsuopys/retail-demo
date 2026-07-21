@@ -1,6 +1,6 @@
 table marketing_cost_daily
 	lineageTag: 4bb353d5-fa0d-4c32-911a-584a960f5482
-	sourceLineageTag: [au].[marketing_cost_daily]
+	sourceLineageTag: [gold].[marketing_cost_daily]
 
 	/// Marketing spend filtered by the Marketing table channel context.
 	measure 'Marketing Spend (Channel)' = CALCULATE(SUM('marketing_cost_daily'[Cost]), TREATAS(VALUES(fact_marketing[Campaign ID]), 'marketing_cost_daily'[Campaign ID]))
@@ -85,6 +85,6 @@ table marketing_cost_daily
 		mode: directLake
 		source
 			entityName: marketing_cost_daily
-			schemaName: au
+			schemaName: gold
 			expressionSource: 'DirectLake - retail_lakehouse'
 

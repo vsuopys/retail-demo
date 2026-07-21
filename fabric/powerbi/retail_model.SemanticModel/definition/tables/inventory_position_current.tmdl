@@ -1,6 +1,6 @@
 table inventory_position_current
 	lineageTag: 80253872-c9ec-4d0d-b638-c3c5163306c3
-	sourceLineageTag: [au].[inventory_position_current]
+	sourceLineageTag: [gold].[inventory_position_current]
 
 	/// Store units currently on hand.
 	measure 'Total Units on Hand' = SUM('inventory_position_current'[On Hand])
@@ -96,6 +96,6 @@ table inventory_position_current
 		mode: directLake
 		source
 			entityName: inventory_position_current
-			schemaName: au
+			schemaName: gold
 			expressionSource: 'DirectLake - retail_lakehouse'
 

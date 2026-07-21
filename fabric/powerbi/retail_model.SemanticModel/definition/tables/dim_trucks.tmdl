@@ -1,6 +1,6 @@
 table dim_trucks
 	lineageTag: 7eb610bd-c508-404e-b04a-5cb53d07d17a
-	sourceLineageTag: [ag].[dim_trucks]
+	sourceLineageTag: [silver].[dim_trucks]
 
 	measure '# of Trucks' = COUNTROWS(dim_trucks)
 		formatString: #,0
@@ -56,6 +56,6 @@ table dim_trucks
 		mode: directLake
 		source
 			entityName: dim_trucks
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

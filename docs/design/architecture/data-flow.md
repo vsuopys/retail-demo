@@ -30,8 +30,8 @@ flowchart LR
     M[setup-02<br/>dimensions and date]
     F[setup-03<br/>facts and run log]
     G[setup-04<br/>Gold]
-    Silver[(ag Silver)]
-    Gold[(au Gold)]
+    Silver[(silver Silver)]
+    Gold[(gold Gold)]
 
     D --> M --> Silver
     Silver --> F --> Silver
@@ -61,14 +61,14 @@ flowchart LR
     KQL[(Eventhouse KQL)]
     Bronze[cusn shortcuts]
     S[03-streaming-to-silver]
-    Silver[(ag Silver)]
+    Silver[(silver Silver)]
     G[04-streaming-to-gold]
-    Gold[(au Gold)]
+    Gold[(gold Gold)]
 
     KQL --> Bronze --> S --> Silver --> G --> Gold
 ```
 
-This path uses `ag._watermarks`. Its committed pipeline schedule is disabled.
+This path uses `silver._watermarks`. Its committed pipeline schedule is disabled.
 It contains known contract divergence, including streaming-only
 `fact_online_order_status`.
 
@@ -90,7 +90,7 @@ flowchart LR
 Execution and freshness evidence is currently distributed across:
 
 - `setup_run_log`
-- `ag._watermarks`
+- `silver._watermarks`
 - Fabric notebook/pipeline history
 - Eventhouse ingestion state
 - ML model output metadata where present

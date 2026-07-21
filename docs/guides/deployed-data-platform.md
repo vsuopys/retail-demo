@@ -58,18 +58,18 @@ and source tables have been verified.
 ## 3. Inspect durable Lakehouse history
 
 1. Open `retail_lakehouse`.
-2. Expand **Tables**, then the `ag` schema.
+2. Expand **Tables**, then the `silver` schema.
 3. Select `fact_receipts`.
 
 ![Lakehouse fact_receipts preview](../assets/screenshots/lakehouse-fact-receipts.png)
 
-*The Lakehouse explorer shows the Silver `ag.fact_receipts` table and a row
+*The Lakehouse explorer shows the Silver `silver.fact_receipts` table and a row
 preview from the generated historical dataset.*
 
 Point out:
 
-- `ag` contains typed Silver dimensions and facts.
-- `au` contains Gold aggregates used for analytics.
+- `silver` contains typed Silver dimensions and facts.
+- `gold` contains Gold aggregates used for analytics.
 - `fact_receipts` provides durable receipt-grain history.
 - The preview demonstrates shape and content, not current operational
   freshness.
@@ -112,7 +112,7 @@ Do not run the numbered deployment scripts during a presentation.
 | --- | --- |
 | Open `streaming-data-load` | The Silver notebook precedes the Gold notebook in the pipeline canvas. |
 | Open `03-streaming-to-silver` | The notebook identifies Eventhouse sources, Silver targets, and watermark-based processing. |
-| Select `ag.fact_receipts` | The Lakehouse explorer shows the table schema and a row preview after historical setup. |
+| Select `silver.fact_receipts` | The Lakehouse explorer shows the table schema and a row preview after historical setup. |
 | Run the recent receipt query | Rows have recent `ingest_timestamp` values when the optional stream is active. |
 
 Continue with [Analytics and AI](deployed-analytics-ai.md).

@@ -1,6 +1,6 @@
 table customer_segments
 	lineageTag: c5e6e000-0000-0000-0001-000000000000
-	sourceLineageTag: [au].[customer_segments]
+	sourceLineageTag: [gold].[customer_segments]
 
 	/// Distinct customers represented in the ML segmentation output.
 	measure 'Segmented Customer Count' = DISTINCTCOUNT('customer_segments'[Customer ID])
@@ -135,6 +135,6 @@ table customer_segments
 		mode: directLake
 		source
 			entityName: customer_segments
-			schemaName: au
+			schemaName: gold
 			expressionSource: 'DirectLake - retail_lakehouse'
 

@@ -40,7 +40,7 @@ description: Describes the primary technologies, frameworks, libraries, and lang
 Event Flow:
   stream-events.ipynb (PySpark)
     → Eventhouse KQL tables (Spark Kusto connector)
-    → Lakehouse Silver (ag) → Gold (au)
+    → Lakehouse Silver (silver) → Gold (gold)
 
 Data Layers:
   Bronze (raw JSON)

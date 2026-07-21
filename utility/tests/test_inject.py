@@ -10,7 +10,7 @@ from retail_setup.notebooks.inject import (
 UTILITY = Path(__file__).resolve().parents[1]
 
 VALUES = {
-    "LAKEHOUSE_NAME": "demo_lh", "SILVER_DB": "ag", "GOLD_DB": "au",
+    "LAKEHOUSE_NAME": "demo_lh", "SILVER_DB": "silver", "GOLD_DB": "gold",
     "STORE_TYPE": "hardware", "START_DATE": "2025-01-01",
     "END_DATE": "2025-02-28", "STORE_COUNT": "12", "SEED": "7",
     "DICTIONARY_REF": "abc123",

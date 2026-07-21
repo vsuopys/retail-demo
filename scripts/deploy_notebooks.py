@@ -41,11 +41,20 @@ FABRIC_API = "https://api.fabric.microsoft.com/v1"
 FABRIC_SCOPE = "https://api.fabric.microsoft.com/.default"
 SQL_SCOPE = "https://database.windows.net/.default"
 
-# Notebooks to deploy (repo path relative to REPO_ROOT)
-NOTEBOOK_DIR = REPO_ROOT / "fabric" / "lakehouse"
-NOTEBOOK_FILES = sorted(NOTEBOOK_DIR.glob("*.ipynb"))
+# Notebooks to deploy (repo paths relative to REPO_ROOT)
+NOTEBOOK_DIRS = (
+    REPO_ROOT / "fabric" / "lakehouse",
+    REPO_ROOT / "utility" / "notebooks",
+)
+NOTEBOOK_FILES = sorted(
+    {
+        nb_file
+        for notebook_dir in NOTEBOOK_DIRS
+        for nb_file in notebook_dir.glob("*.ipynb")
+    }
+)
 
-# Old gold_-prefixed tables to drop from the au schema
+# Old gold_-prefixed tables to drop from the gold schema
 OLD_TABLES = [
     "gold_churn_predictions",
     "gold_customer_segments",
@@ -322,7 +331,7 @@ def drop_tables_pyodbc(sql_endpoint: str, sql_token: str, dry_run: bool) -> bool
 
     cursor = conn.cursor()
     for table in OLD_TABLES:
-        stmt = f"DROP TABLE IF EXISTS [au].[{table}]"
+        stmt = f"DROP TABLE IF EXISTS [gold].[{table}]"
         print(f"  {'Would run' if dry_run else 'Running'}: {stmt}")
         if not dry_run:
             try:
@@ -347,12 +356,12 @@ def drop_tables_fallback(dry_run: bool) -> None:
     print("\n  pyodbc not available. Run these in your Lakehouse SQL endpoint:")
     print("  " + "-" * 60)
     for table in OLD_TABLES:
-        print(f"  DROP TABLE IF EXISTS [au].[{table}];")
+        print(f"  DROP TABLE IF EXISTS [gold].[{table}];")
     print("  " + "-" * 60)
     print("  Or run this PySpark in a Fabric notebook:")
     print("  " + "-" * 60)
     for table in OLD_TABLES:
-        print(f'  spark.sql("DROP TABLE IF EXISTS au.{table}")')
+        print(f'  spark.sql("DROP TABLE IF EXISTS gold.{table}")')
     print("  " + "-" * 60)
 
 

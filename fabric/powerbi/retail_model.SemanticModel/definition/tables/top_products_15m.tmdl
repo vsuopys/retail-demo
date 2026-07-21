@@ -1,6 +1,6 @@
 table top_products_15m
 	lineageTag: eda9ac0d-bc37-4363-96b4-298c279801bc
-	sourceLineageTag: [au].[top_products_15m]
+	sourceLineageTag: [gold].[top_products_15m]
 
 	measure 'Top Product Revenue' = SUM('top_products_15m'[Revenue])
 		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
@@ -52,6 +52,6 @@ table top_products_15m
 		mode: directLake
 		source
 			entityName: top_products_15m
-			schemaName: au
+			schemaName: gold
 			expressionSource: 'DirectLake - retail_lakehouse'
 

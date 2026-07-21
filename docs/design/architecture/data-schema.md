@@ -43,7 +43,7 @@ PascalCase and mixed-case columns retained for existing TMDL bindings.
 
 The KQL scripts define five core and three pricing materialized views.
 
-## Lakehouse Silver (`ag`)
+## Lakehouse Silver (`silver`)
 
 ### Dimensions (7)
 
@@ -62,13 +62,13 @@ The KQL scripts define five core and three pricing materialized views.
 ### Operational state
 
 - `setup_run_log`
-- streaming-only `ag._watermarks`
+- streaming-only `silver._watermarks`
 - current divergent streaming output `fact_online_order_status`
 
 `fact_online_order_status` is not part of the base contract or active semantic
 model.
 
-## Lakehouse Gold (`au`)
+## Lakehouse Gold (`gold`)
 
 `sales_minute_store`, `top_products_15m`, `inventory_position_current`,
 `dc_inventory_position_current`, `truck_dwell_daily`, `online_sales_daily`,

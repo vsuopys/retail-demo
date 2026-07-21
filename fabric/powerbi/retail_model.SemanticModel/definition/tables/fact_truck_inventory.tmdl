@@ -1,6 +1,6 @@
 table fact_truck_inventory
 	lineageTag: d65dd252-405a-484b-9e2e-efc842442898
-	sourceLineageTag: [ag].[fact_truck_inventory]
+	sourceLineageTag: [silver].[fact_truck_inventory]
 
 	column 'Truck ID'
 		dataType: int64
@@ -97,6 +97,6 @@ table fact_truck_inventory
 		mode: directLake
 		source
 			entityName: fact_truck_inventory
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

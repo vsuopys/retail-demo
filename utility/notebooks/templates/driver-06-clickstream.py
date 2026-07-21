@@ -76,7 +76,7 @@ def _param(value: str, default: str) -> str:
 
 
 LAKEHOUSE_NAME = _param("{{LAKEHOUSE_NAME}}", "retail_lakehouse")
-SILVER_DB = _param("{{SILVER_DB}}", "ag")
+SILVER_DB = _param("{{SILVER_DB}}", "silver")
 
 
 def _count(table: str, default: int) -> int:

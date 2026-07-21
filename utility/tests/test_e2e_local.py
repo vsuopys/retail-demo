@@ -35,7 +35,7 @@ def test_full_pipeline_hardware_store(spark, tmp_path):
     assert set(GOLD_TABLES) <= set(written)
 
     # read-back sanity: receipts re-load with the contract column count
-    back = spark.read.parquet(str(tmp_path / "ag" / "fact_receipts"))
+    back = spark.read.parquet(str(tmp_path / "silver" / "fact_receipts"))
     assert back.count() == result.tables["fact_receipts"].count()
     # hardware profile visible end-to-end: weekend traffic spike
     by_dow = {r["dow"]: r["n"] for r in

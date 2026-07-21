@@ -3,7 +3,7 @@
 ### REQ-GEN-001 - Base table set
 
 Historical generation shall create seven dimensions, eighteen fact tables, and
-nine Gold aggregates in the documented `ag` and `au` schemas.
+nine Gold aggregates in the documented `silver` and `gold` schemas.
 
 ### REQ-GEN-002 - Authoritative contract
 

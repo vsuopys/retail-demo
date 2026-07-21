@@ -1,6 +1,6 @@
 table dim_date
 	lineageTag: 8a9c5f7e-7d3b-4f0a-9b6d-2e4f8c9a1b3d
-	sourceLineageTag: [ag].[dim_date]
+	sourceLineageTag: [silver].[dim_date]
 	dataCategory: Time
 
 	column 'Date Key'
@@ -212,6 +212,6 @@ table dim_date
 		mode: directLake
 		source
 			entityName: dim_date
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

@@ -60,7 +60,7 @@ artifacts, distinct from the committed source notebooks.
 Data flows through Fabric in layers, and the authoritative schema for each layer
 lives in a specific file. Read these before changing any data mapping:
 
-- **Base/historical Lakehouse contract** — `utility/src/retail_setup/generation/schemas.py` (`TABLES`). Setup notebooks 01–04 write Silver (`ag`, dims + facts) and Gold (`au`, aggregates) directly.
+- **Base/historical Lakehouse contract** — `utility/src/retail_setup/generation/schemas.py` (`TABLES`). Setup notebooks 01–04 write Silver (`silver`, dims + facts) and Gold (`gold`, aggregates) directly.
 - **Live event payloads** — `utility/notebooks/templates/driver-05-stream.py` (`EVENT_PAYLOADS`). The stream notebook writes typed events to Eventhouse via the Spark Kusto connector.
 - **Eventhouse/KQL tables** — `fabric/kql_database/01-create-tables.kql` (streaming-only, `cusn` schema).
 - **Silver/Gold streaming transforms** — `fabric/lakehouse/03-streaming-to-silver.ipynb`, `04-streaming-to-gold.ipynb`.

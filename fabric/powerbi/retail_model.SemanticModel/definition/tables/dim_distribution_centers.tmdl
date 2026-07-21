@@ -1,6 +1,6 @@
 table dim_distribution_centers
 	lineageTag: ae706b9b-d53f-48e5-8f09-4c969f0d6b4a
-	sourceLineageTag: [ag].[dim_distribution_centers]
+	sourceLineageTag: [silver].[dim_distribution_centers]
 
 	measure '# of Distribution Centers' = COUNTROWS('dim_distribution_centers')
 		formatString: #,0
@@ -61,6 +61,6 @@ table dim_distribution_centers
 		mode: directLake
 		source
 			entityName: dim_distribution_centers
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

@@ -1,6 +1,6 @@
 table fact_promotions
 	lineageTag: 09104865-1d77-427a-bc33-b0148839d9a5
-	sourceLineageTag: [ag].[fact_promotions]
+	sourceLineageTag: [silver].[fact_promotions]
 
 	/// Count of promotion header events.
 	measure 'Promotion Count' = COUNTROWS(fact_promotions)
@@ -131,6 +131,6 @@ table fact_promotions
 		mode: directLake
 		source
 			entityName: fact_promotions
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

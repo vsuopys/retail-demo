@@ -1,6 +1,6 @@
 table dim_products
 	lineageTag: 7a341aa1-e4de-4e62-8737-d78ecfeea40b
-	sourceLineageTag: [ag].[dim_products]
+	sourceLineageTag: [silver].[dim_products]
 
 	measure '# of Products' = COUNTROWS(dim_products)
 		formatString: #,0
@@ -190,6 +190,6 @@ table dim_products
 		mode: directLake
 		source
 			entityName: dim_products
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

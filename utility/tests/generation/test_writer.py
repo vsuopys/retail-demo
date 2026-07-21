@@ -35,11 +35,11 @@ def test_write_all_writes_everything_and_run_log(spark, tmp_path):
 
     written = write_all(result.tables, gold, cfg, run_id="testrun",
                         base_path=str(tmp_path), fmt="parquet")
-    # silver tables under <base>/ag/<table>, gold under <base>/au/<table>
-    assert (tmp_path / "ag" / "fact_receipts").exists()
-    assert (tmp_path / "au" / "tender_mix_daily").exists()
-    assert (tmp_path / "ag" / "dim_date").exists()
-    log = spark.read.parquet(str(tmp_path / "ag" / "setup_run_log"))
+    # silver tables under <base>/silver/<table>, gold under <base>/gold/<table>
+    assert (tmp_path / "silver" / "fact_receipts").exists()
+    assert (tmp_path / "gold" / "tender_mix_daily").exists()
+    assert (tmp_path / "silver" / "dim_date").exists()
+    log = spark.read.parquet(str(tmp_path / "silver" / "setup_run_log"))
     assert log.filter("run_id = 'testrun'").count() == len(written)
     cols = set(log.columns)
     assert {"run_id", "store_type", "seed", "start_date", "end_date",

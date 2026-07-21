@@ -1,6 +1,6 @@
 table fact_receipts
 	lineageTag: dbb3a597-d860-42d1-9585-a7da0fc2a2a4
-	sourceLineageTag: [ag].[fact_receipts]
+	sourceLineageTag: [silver].[fact_receipts]
 
 	/// Total store sales from receipt headers, stored in cents and reported in currency.
 	measure 'Total Sales' = DIVIDE(SUM('fact_receipts'[Total Cents]), 100, 0)
@@ -393,6 +393,6 @@ table fact_receipts
 		mode: directLake
 		source
 			entityName: fact_receipts
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

@@ -1,6 +1,6 @@
 table fact_online_order_headers
 	lineageTag: 930ea7c8-e0a4-4f4a-a7df-1cf98fbeeefd
-	sourceLineageTag: [ag].[fact_online_order_headers]
+	sourceLineageTag: [silver].[fact_online_order_headers]
 
 	/// Total online order sales, stored in cents and reported in currency.
 	measure 'Total Online Sales' = DIVIDE(SUM('fact_online_order_headers'[Total Cents]), 100, 0)
@@ -170,6 +170,6 @@ table fact_online_order_headers
 		mode: directLake
 		source
 			entityName: fact_online_order_headers
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

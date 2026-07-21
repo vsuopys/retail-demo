@@ -1,6 +1,6 @@
 table fact_marketing
 	lineageTag: 0de63cc1-c6da-4354-8a04-602a3c737aa8
-	sourceLineageTag: [ag].[fact_marketing]
+	sourceLineageTag: [silver].[fact_marketing]
 
 	column Device
 		dataType: string
@@ -118,6 +118,6 @@ table fact_marketing
 		mode: directLake
 		source
 			entityName: fact_marketing
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

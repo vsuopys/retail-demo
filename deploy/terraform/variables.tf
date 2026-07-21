@@ -76,7 +76,7 @@ variable "lakehouse_name" {
 variable "lakehouse_enable_schemas" {
   type        = bool
   default     = true
-  description = "Enable Lakehouse schemas for ag and au tables."
+  description = "Enable Lakehouse schemas for silver and gold tables."
 }
 
 variable "eventhouse_name" {

@@ -12,8 +12,8 @@ def test_defaults_are_valid():
     assert cfg.store_type == "supercenter"
     assert cfg.store_count == 50
     assert cfg.seed == 42
-    assert cfg.silver_db == "ag"
-    assert cfg.gold_db == "au"
+    assert cfg.silver_db == "silver"
+    assert cfg.gold_db == "gold"
 
 
 def test_end_before_start_rejected():

@@ -289,8 +289,8 @@ Choose one path.
 In the Fabric workspace, run setup notebooks 01 through 04 in order. This is
 the smallest supported path and creates:
 
-- Silver schema `ag`: seven dimensions, eighteen fact tables, and run metadata;
-- Gold schema `au`: nine aggregate tables.
+- Silver schema `silver`: seven dimensions, eighteen fact tables, and run metadata;
+- Gold schema `gold`: nine aggregate tables.
 
 ### Full setup pipeline
 
@@ -319,7 +319,7 @@ Before using the demo:
 1. Confirm `retail_lakehouse` and `retail_eventhouse` exist in the intended
    workspace.
 2. Confirm setup notebooks or `setup-pipeline` completed successfully.
-3. Confirm the `ag` and `au` schemas and expected tables are populated.
+3. Confirm the `silver` and `gold` schemas and expected tables are populated.
 4. Inspect `setup_run_log` and retain the successful run identifier.
 5. Confirm the KQL database contains the numbered tables, functions, and
    materialized views.

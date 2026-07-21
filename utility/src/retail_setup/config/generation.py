@@ -41,8 +41,8 @@ class GenerationConfig(BaseModel):
     end_date: date | None = None
     store_count: int = Field(default=50, gt=0, le=2000)
     seed: int = 42
-    silver_db: str = "ag"
-    gold_db: str = "au"
+    silver_db: str = "silver"
+    gold_db: str = "gold"
     # Optional override for dictionary root; when None, default_dictionary_root() is used.
     # Pass an absolute path string to point at a custom dictionary tree (e.g. a Fabric
     # lakehouse Files mount) without mutating the package data directory.

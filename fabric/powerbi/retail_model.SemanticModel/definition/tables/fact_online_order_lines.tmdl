@@ -1,6 +1,6 @@
 table fact_online_order_lines
 	lineageTag: ead55580-9419-45ac-91ff-f5ac29096866
-	sourceLineageTag: [ag].[fact_online_order_lines]
+	sourceLineageTag: [silver].[fact_online_order_lines]
 
 	/// Total online item units.
 	measure 'Total Online Units' = SUM('fact_online_order_lines'[Quantity])
@@ -201,6 +201,6 @@ table fact_online_order_lines
 		mode: directLake
 		source
 			entityName: fact_online_order_lines
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

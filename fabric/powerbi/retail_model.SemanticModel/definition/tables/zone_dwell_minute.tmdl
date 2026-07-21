@@ -1,6 +1,6 @@
 table zone_dwell_minute
 	lineageTag: 0bf09335-5a4f-471c-9b09-32b6f8261fa6
-	sourceLineageTag: [au].[zone_dwell_minute]
+	sourceLineageTag: [gold].[zone_dwell_minute]
 
 	measure 'Zone Customers' = SUM('zone_dwell_minute'[Customers])
 		formatString: #,0
@@ -74,6 +74,6 @@ table zone_dwell_minute
 		mode: directLake
 		source
 			entityName: zone_dwell_minute
-			schemaName: au
+			schemaName: gold
 			expressionSource: 'DirectLake - retail_lakehouse'
 

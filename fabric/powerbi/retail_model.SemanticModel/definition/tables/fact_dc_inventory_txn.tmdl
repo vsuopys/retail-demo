@@ -1,6 +1,6 @@
 table fact_dc_inventory_txn
 	lineageTag: 1f83be55-41e6-4951-8d58-fc6f4a5cfa45
-	sourceLineageTag: [ag].[fact_dc_inventory_txn]
+	sourceLineageTag: [silver].[fact_dc_inventory_txn]
 
 	column 'Transaction Type'
 		dataType: string
@@ -84,6 +84,6 @@ table fact_dc_inventory_txn
 		mode: directLake
 		source
 			entityName: fact_dc_inventory_txn
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

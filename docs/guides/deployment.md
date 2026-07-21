@@ -324,7 +324,7 @@ At minimum, verify:
 - required item inventory and bindings;
 - ordered KQL objects;
 - successful historical setup;
-- populated `ag` and `au` tables;
+- populated `silver` and `gold` tables;
 - semantic-model binding;
 - recent Eventhouse rows when live streaming is part of the demo.
 

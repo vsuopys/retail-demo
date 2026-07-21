@@ -140,8 +140,8 @@ retail-demo/
 **Scope:**
 - Lakehouse Silver dimension and fact tables (utility generator output)
 - KQL event tables in Eventhouse (cusn schema)
-- Lakehouse Silver tables (ag schema)
-- Lakehouse Gold tables (au schema)
+- Lakehouse Silver tables (silver schema)
+- Lakehouse Gold tables (gold schema)
 
 **Examples:**
 - Correct: `event_ts`, `receipt_id_ext`, `customer_id`, `store_id`

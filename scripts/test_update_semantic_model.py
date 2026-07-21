@@ -162,7 +162,7 @@ def test_update_table_files():
 \t\tmode: directLake
 \t\tsource
 \t\t\tentityName: dim_products
-\t\t\tschemaName: ag
+\t\t\tschemaName: silver
 \t\t\texpressionSource: 'DirectLake - retail_lakehouse'
 """
 

@@ -1,6 +1,6 @@
 table truck_dwell_daily
 	lineageTag: 27b86d53-bcc1-4b0c-a6b6-bef459bc35ed
-	sourceLineageTag: [au].[truck_dwell_daily]
+	sourceLineageTag: [gold].[truck_dwell_daily]
 
 	/// Total truck visits in daily dwell aggregates.
 	measure 'Total Trucks' = SUM('truck_dwell_daily'[Trucks])
@@ -78,6 +78,6 @@ table truck_dwell_daily
 		mode: directLake
 		source
 			entityName: truck_dwell_daily
-			schemaName: au
+			schemaName: gold
 			expressionSource: 'DirectLake - retail_lakehouse'
 

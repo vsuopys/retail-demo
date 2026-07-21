@@ -1,6 +1,6 @@
 table fact_stockouts
 	lineageTag: 620b34c9-377c-44fe-bad4-8159499fc668
-	sourceLineageTag: [ag].[fact_stockouts]
+	sourceLineageTag: [silver].[fact_stockouts]
 
 	/// Count of historical stockout events.
 	measure 'Stockout Events' = COUNTROWS('fact_stockouts')
@@ -78,6 +78,6 @@ table fact_stockouts
 		mode: directLake
 		source
 			entityName: fact_stockouts
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

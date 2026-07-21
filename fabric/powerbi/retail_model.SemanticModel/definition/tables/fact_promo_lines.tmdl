@@ -1,6 +1,6 @@
 table fact_promo_lines
 	lineageTag: 6f0a86e5-8a4e-44c1-a568-13af0862f5ef
-	sourceLineageTag: [ag].[fact_promo_lines]
+	sourceLineageTag: [silver].[fact_promo_lines]
 
 	/// Quantity of units associated with promotion line events.
 	measure 'Promo Line Quantity' = SUM('fact_promo_lines'[Quantity])
@@ -109,6 +109,6 @@ table fact_promo_lines
 		mode: directLake
 		source
 			entityName: fact_promo_lines
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

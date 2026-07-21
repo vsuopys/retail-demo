@@ -76,8 +76,8 @@ documented in `schemas.py` and must not be silently normalized in a transform.
 Supported profiles are `supercenter`, `grocery`, `hardware`, and `luxury`.
 Current derived defaults include:
 
-- `silver_db = ag`
-- `gold_db = au`
+- `silver_db = silver`
+- `gold_db = gold`
 - `dc_count = max(1, store_count // 10)`
 - `customer_count = max(store_count * 1000, 5000)`
 - `online_orders_per_day = store_count * 8`

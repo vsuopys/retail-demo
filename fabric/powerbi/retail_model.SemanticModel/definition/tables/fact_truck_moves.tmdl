@@ -1,6 +1,6 @@
 table fact_truck_moves
 	lineageTag: 486b3beb-5e42-4766-b0d7-1147520e5a37
-	sourceLineageTag: [ag].[fact_truck_moves]
+	sourceLineageTag: [silver].[fact_truck_moves]
 
 	/// Count of truck movement events.
 	measure 'Truck Move Count' = COUNTROWS('fact_truck_moves')
@@ -97,6 +97,6 @@ table fact_truck_moves
 		mode: directLake
 		source
 			entityName: fact_truck_moves
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

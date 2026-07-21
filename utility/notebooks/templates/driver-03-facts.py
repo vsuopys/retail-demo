@@ -39,8 +39,8 @@ def _param(value: str, default: str) -> str:
     return default if len(value) > 1 and value[0] == value[1] == "{" else value
 
 LAKEHOUSE_NAME = _param("{{LAKEHOUSE_NAME}}", "retail_lakehouse")
-SILVER_DB = _param("{{SILVER_DB}}", "ag")
-GOLD_DB = _param("{{GOLD_DB}}", "au")
+SILVER_DB = _param("{{SILVER_DB}}", "silver")
+GOLD_DB = _param("{{GOLD_DB}}", "gold")
 STORE_TYPE = _param("{{STORE_TYPE}}", "supercenter")
 START_DATE = _param("{{START_DATE}}", "2025-01-01")
 END_DATE = _param("{{END_DATE}}", "2025-03-31")

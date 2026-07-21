@@ -14,7 +14,7 @@ merchandising, or executive/analytics audiences.
 ## Before the audience arrives
 
 1. Complete the [getting-started guide](getting-started.md).
-2. Confirm the required KQL tables and `ag`/`au` Lakehouse tables exist.
+2. Confirm the required KQL tables and `silver`/`gold` Lakehouse tables exist.
 3. Open the Eventhouse query editor, Power BI report, and the streaming notebook.
 4. Decide whether dashboard, ontology, agent, and ML surfaces are ready; skip any
    surface that has not passed its support gate.
@@ -76,8 +76,8 @@ tests, but present it only after a bounded live run produces recent
 Run or show the last successful streaming-to-Silver/Gold pipeline. In the
 Lakehouse:
 
-- inspect `ag.fact_receipts` or another mapped fact;
-- inspect a Gold aggregate such as `au.sales_minute_store`;
+- inspect `silver.fact_receipts` or another mapped fact;
+- inspect a Gold aggregate such as `gold.sales_minute_store`;
 - show run or watermark evidence rather than relying on visual freshness alone.
 
 ## 5. Show Power BI

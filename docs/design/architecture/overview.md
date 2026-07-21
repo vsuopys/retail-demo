@@ -19,7 +19,7 @@ flowchart LR
     subgraph Fabric[Microsoft Fabric workspace]
         SetupNB[setup-01..04]
         Stream[stream-events]
-        Lake[(Lakehouse<br/>Silver ag / Gold au)]
+        Lake[(Lakehouse<br/>Silver silver / Gold gold)]
         Event[(Eventhouse<br/>KQL database)]
         KQL[KQL functions, views, querysets]
         Pipes[Data Pipelines]

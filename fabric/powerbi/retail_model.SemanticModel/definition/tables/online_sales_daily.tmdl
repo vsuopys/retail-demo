@@ -1,6 +1,6 @@
 table online_sales_daily
 	lineageTag: a2c1b744-09a3-4341-9934-282e0cd86ef7
-	sourceLineageTag: [au].[online_sales_daily]
+	sourceLineageTag: [gold].[online_sales_daily]
 
 	measure 'Online Revenue' = SUM('online_sales_daily'[Total])
 		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
@@ -98,6 +98,6 @@ table online_sales_daily
 		mode: directLake
 		source
 			entityName: online_sales_daily
-			schemaName: au
+			schemaName: gold
 			expressionSource: 'DirectLake - retail_lakehouse'
 

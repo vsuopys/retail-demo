@@ -1,6 +1,6 @@
 table fact_reorders
 	lineageTag: 5d56e188-c68e-4de1-a166-dba2aab94430
-	sourceLineageTag: [ag].[fact_reorders]
+	sourceLineageTag: [silver].[fact_reorders]
 
 	/// Total units requested by reorder events.
 	measure 'Total Reorder Quantity' = SUM('fact_reorders'[Reorder Quantity])
@@ -129,6 +129,6 @@ table fact_reorders
 		mode: directLake
 		source
 			entityName: fact_reorders
-			schemaName: ag
+			schemaName: silver
 			expressionSource: 'DirectLake - retail_lakehouse'
 

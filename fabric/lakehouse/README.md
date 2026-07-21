@@ -10,8 +10,8 @@ The supported historical bootstrap is rendered from `utility/` and runs:
 3. `setup-03-generate-facts`
 4. `setup-04-build-gold`
 
-Those notebooks write the base contract directly to Lakehouse Silver (`ag`) and
-Gold (`au`).
+Those notebooks write the base contract directly to Lakehouse Silver (`silver`) and
+Gold (`gold`).
 
 Notable groups in this directory:
 
