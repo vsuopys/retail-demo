@@ -90,6 +90,10 @@ NOTEBOOK_GROUPS = {
         "14-ml-dynamic-pricing.ipynb",
     ],
     "ontology": ["30-create-ontology.ipynb"],
+    # Opt-in reverse-ETL: seeds the external Azure SQL OLTP source (later
+    # mirrored into the lakehouse "bronze" schema) from the silver Delta tables.
+    # Not part of a default deploy; select with `--notebook-groups oltp`.
+    "oltp": ["50-silver-to-azuresql-oltp.ipynb"],
     "setup": [],  # handled specially by stage_setup_notebooks — not fabric/lakehouse path
     "stream": [],  # handled specially by stage_stream_notebooks — utility/out path
     "utility": ["90-augment-and-dedupe-receipts.ipynb"],
