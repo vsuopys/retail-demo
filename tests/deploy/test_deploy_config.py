@@ -114,6 +114,11 @@ def test_render_tfvars_clickstream_toggle() -> None:
     assert 'clickstream_kql_database_name = "clickstream"' in tfvars
     assert 'clickstream_eventstream_name = "clickstream_eventstream"' in tfvars
     assert 'clickstream_table_name = "clickstream_events"' in tfvars
+    # Shortcut projecting the KQL table into the lakehouse bronze schema.
+    assert 'clickstream_shortcut_schema = "bronze"' in tfvars
+    assert 'clickstream_shortcut_name = "clickstream_events"' in tfvars
+    # Off: no shortcut config either.
+    assert "clickstream_shortcut_schema" not in off_tfvars
 
 
 def test_render_fabric_cicd_config_uses_environment_workspace() -> None:

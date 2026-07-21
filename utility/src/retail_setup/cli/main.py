@@ -734,6 +734,18 @@ def _deploy_plan(
             description="Bind real-time Spark pool to its Fabric Environment",
         ),
         DeployStep(
+            cmd=[
+                py,
+                "-m",
+                "deploy.scripts.configure_shortcuts",
+                "--environment",
+                env,
+                "--auth-mode",
+                auth_mode,
+            ],
+            description="Create clickstream OneLake shortcut in the lakehouse bronze schema",
+        ),
+        DeployStep(
             cmd=[py, "-m", "deploy.scripts.validate_deployment", "--environment", env],
             description="Validate deployment",
         ),

@@ -92,3 +92,18 @@ output "clickstream_eventstream_name" {
   value       = var.clickstream_enabled ? fabric_eventstream.clickstream[0].display_name : null
   description = "Clickstream Eventstream display name (null when clickstream is disabled)."
 }
+
+output "clickstream_table_name" {
+  value       = var.clickstream_enabled ? var.clickstream_table_name : null
+  description = "Clickstream KQL table name (also the OneLake path segment shortcut target; null when clickstream is disabled)."
+}
+
+output "clickstream_shortcut_schema" {
+  value       = var.clickstream_enabled ? var.clickstream_shortcut_schema : null
+  description = "Lakehouse schema that holds the clickstream OneLake shortcut (null when clickstream is disabled). Consumed by deploy.scripts.configure_shortcuts."
+}
+
+output "clickstream_shortcut_name" {
+  value       = var.clickstream_enabled ? var.clickstream_shortcut_name : null
+  description = "Name of the clickstream OneLake shortcut in the lakehouse bronze schema (null when clickstream is disabled). Consumed by deploy.scripts.configure_shortcuts."
+}

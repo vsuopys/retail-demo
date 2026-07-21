@@ -30,6 +30,9 @@ clickstream:
   kql_database_name: clickstream
   eventstream_name: clickstream_eventstream
   table_name: clickstream_events
+  # OneLake shortcut projecting the KQL clickstream table into the lakehouse.
+  shortcut_schema: bronze
+  shortcut_name: clickstream_events
 spark:
   use_custom_pool: true
   custom_pool_name: retail_setup_pool

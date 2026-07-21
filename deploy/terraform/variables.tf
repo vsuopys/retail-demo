@@ -129,6 +129,18 @@ variable "clickstream_table_name" {
   description = "KQL table that receives clickstream events. Columns are matched by name against the event JSON (event_id, customer_id, event_timestamp, event_type, detail)."
 }
 
+variable "clickstream_shortcut_schema" {
+  type        = string
+  default     = "bronze"
+  description = "Lakehouse schema (folder under Tables/) that holds the OneLake shortcut to the clickstream KQL table. Created implicitly when the shortcut is placed there by deploy.scripts.configure_shortcuts."
+}
+
+variable "clickstream_shortcut_name" {
+  type        = string
+  default     = "clickstream_events"
+  description = "Name of the OneLake shortcut created in the lakehouse bronze schema, pointing at the clickstream KQL table's OneLake (Delta) path."
+}
+
 variable "spark_custom_pool_enabled" {
   type        = bool
   default     = false

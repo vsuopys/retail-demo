@@ -130,6 +130,30 @@ The real-time path is provisioned by `deploy/terraform/clickstream.tf`
   **Eventhouse ProcessedIngestion** destination (columns matched by name; no
   named ingestion mapping required).
 
+### Lakehouse `bronze` schema shortcut
+
+The clickstream events are also projected into the `retail_lakehouse` under a
+`bronze` schema via a **OneLake shortcut** (`bronze.clickstream_events` →
+the KQL table's OneLake path), so Notebooks, Warehouse, and Direct Lake can
+read clickstream data through the lakehouse without querying the Eventhouse
+directly. This is handled by `deploy.scripts.configure_shortcuts` as a post-apply
+step (after `configure_environment`), because neither Terraform nor the
+`microsoft/fabric` provider can do either half:
+
+1. **Enable OneLake availability** on the `clickstream_events` table
+   (`.alter table … policy mirroring dataformat=parquet with (IsEnabled=true)`),
+   exposing it as Delta at the KQL database's OneLake path. This management
+   command is run against the live database with the Kusto SDK (the same path
+   `apply_kql` uses) — it is **not** accepted inside a KQL database
+   item-definition schema (`ScriptContainsUnsupportedCommand`).
+2. **Create the OneLake shortcut** into `Tables/bronze` on the schema-enabled
+   lakehouse, which creates the `bronze` schema implicitly.
+
+The schema/shortcut names come from the `clickstream:` block in
+`deploy/config/deploy.yml` (`shortcut_schema`, `shortcut_name`). The step is
+idempotent (`shortcutConflictPolicy=CreateOrOverwrite`) and retries briefly while
+the KQL table's OneLake (Delta) path materializes after mirroring is enabled.
+
 Deploy with the standard flow (`retail-setup deploy --env dev`), which runs the
 Terraform in `deploy/terraform`. Enablement and item names come from
 `deploy/config/deploy.yml` (`clickstream:` block) and are rendered into

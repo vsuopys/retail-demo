@@ -75,6 +75,8 @@ class ClickstreamConfig:
     kql_database_name: str
     eventstream_name: str
     table_name: str
+    shortcut_schema: str
+    shortcut_name: str
 
 
 @dataclass(frozen=True)
@@ -270,6 +272,13 @@ def _to_deploy_config(data: dict[str, Any]) -> DeployConfig:
                 clickstream.get("eventstream_name", "clickstream_eventstream")
             ),
             table_name=str(clickstream.get("table_name", "clickstream_events")),
+            shortcut_schema=str(clickstream.get("shortcut_schema", "bronze")),
+            shortcut_name=str(
+                clickstream.get(
+                    "shortcut_name",
+                    clickstream.get("table_name", "clickstream_events"),
+                )
+            ),
         ),
         notebooks=NotebooksConfig(
             include=[
@@ -385,6 +394,8 @@ def render_tfvars(config: DeployConfig) -> str:
         values["clickstream_kql_database_name"] = config.clickstream.kql_database_name
         values["clickstream_eventstream_name"] = config.clickstream.eventstream_name
         values["clickstream_table_name"] = config.clickstream.table_name
+        values["clickstream_shortcut_schema"] = config.clickstream.shortcut_schema
+        values["clickstream_shortcut_name"] = config.clickstream.shortcut_name
 
     optional_values = {
         "tenant_id": config.tenant_id,
