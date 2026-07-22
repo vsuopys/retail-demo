@@ -13,7 +13,7 @@
      __SAS_TOKEN__  read/list SAS for that container, WITHOUT a leading '?'
 
    Staging column order matches the CSV exactly (IDENTITY PK excluded, loaded_at last).
-   Both are generated from deploy/azuresql/schema/*.sql -- keep in sync.
+   Both are generated from the deploy/azuresql/schema SQL files -- keep in sync.
 
    NOTE: Azure SQL DB does NOT support OPENROWSET(BULK)+WITH schema for CSV over
    https (that is a Synapse serverless feature), so BULK INSERT is used instead.
@@ -324,7 +324,16 @@ WITH (DATA_SOURCE = 'OltpBlobSrc', FORMAT = 'CSV', FIRSTROW = 2,
       FIELDTERMINATOR = ',', FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', CODEPAGE = '65001');
 INSERT INTO retail.payments (receipt_id, order_id, payment_ts, payment_method, amount, transaction_id, status, decline_reason, processing_time_ms, store_id, customer_id, loaded_at)
 SELECT receipt_id, order_id, payment_ts, payment_method, amount, transaction_id, status, decline_reason, processing_time_ms, store_id, customer_id, loaded_at
-FROM #stg_payments;
+FROM (
+    -- UX_payments_transaction is a filtered UNIQUE index (transaction_id WHERE NOT NULL).
+    -- The generator can emit rare TXN_{epoch}_{rand} collisions; keep one row per
+    -- non-null transaction_id (NULL transaction_ids are all retained).
+    SELECT *, CASE WHEN transaction_id IS NULL THEN 1
+                   ELSE ROW_NUMBER() OVER (PARTITION BY transaction_id
+                        ORDER BY payment_ts, receipt_id, order_id) END AS rn
+    FROM #stg_payments
+) d
+WHERE rn = 1;
 DROP TABLE #stg_payments;
 GO
 
