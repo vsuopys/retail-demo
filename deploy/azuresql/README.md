@@ -186,3 +186,46 @@ default is a modest 1M rather than a multi-million-row chunk).
 
 `AUTH_MODE=sql` (Key Vault password) has no token to expire and needs no
 chunking — prefer it if SQL authentication is enabled on the server.
+
+## Bulk load: silver -> blob CSV -> Azure SQL (faster alternative)
+
+The row-by-row JDBC path above is resilient but slow for the 100M+ row fact
+tables. A faster, set-based alternative stages the data as CSV in Azure Blob
+Storage and loads it with `OPENROWSET(BULK ...)`:
+
+```
+retail_lakehouse.silver.*  ->  <container>/<prefix>/<table>.csv  ->  retail.*
+      (Delta)                  fabric/lakehouse/51-silver-to-blob-csv.ipynb
+                               deploy/azuresql/bulk-load/10-bulk-load.sql
+```
+
+* **`fabric/lakehouse/51-silver-to-blob-csv.ipynb`** reshapes silver with the
+  **exact same transforms as notebook 50** (imported verbatim, so the two never
+  drift) and writes RFC4180 CSV to blob. Each file holds every OLTP column except
+  the `IDENTITY` surrogate PK (the server assigns it on load), in DDL order with
+  `loaded_at` last; `BIT` columns are emitted as `0`/`1`. Authenticate with a SAS
+  token (`BLOB_SAS`) or account key (`BLOB_ACCOUNT_KEY`); set `BLOB_ACCOUNT`,
+  `BLOB_CONTAINER`, and optionally `BLOB_PREFIX` (default `oltp-export`),
+  `ONLY_TABLES`, and `LOADED_AT`.
+* **`deploy/azuresql/bulk-load/10-bulk-load.sql`** creates the SAS-scoped
+  `DATABASE SCOPED CREDENTIAL` + `EXTERNAL DATA SOURCE`, then runs one
+  `INSERT ... SELECT ... FROM OPENROWSET(BULK '<table>.csv', FORMAT='CSV', ...)`
+  per table in FK-safe order. Replace `__BLOB_URL__` (container URL) and
+  `__SAS_TOKEN__` (read/list SAS, no leading `?`) before running. The `WITH (...)`
+  column types and the CSV column order are both generated from
+  `deploy/azuresql/schema/*.sql`, so they stay aligned.
+
+Why blob (not OneLake): Azure SQL DB's bulk APIs can only read from Azure Blob
+Storage via a SAS-scoped external data source — they cannot read OneLake (which
+needs AAD).
+
+**Scale note.** `SINGLE_FILE=True` (default) writes one `<table>.csv` per table —
+simplest to load with the committed static SQL and ideal for testing a subset via
+`ONLY_TABLES`. Azure SQL DB `OPENROWSET(BULK)` reads **one file per statement**
+(no wildcards), so for very large tables set `SINGLE_FILE=False` to write parallel
+part files; the notebook's RUN cell then prints a generated per-file loader (one
+`INSERT ... OPENROWSET` per part) to run after the setup section.
+
+CSV caveat: `OPENROWSET FORMAT='CSV'` with `PARSER_VERSION='2.0'` does not reliably
+handle line breaks embedded inside quoted text fields. The synthetic data does not
+contain them, but keep it in mind if the source ever changes.
