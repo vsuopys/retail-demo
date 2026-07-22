@@ -100,7 +100,7 @@ bulk-writes to Azure SQL in **foreign-key-safe order**.
 | `TARGET_SCHEMA` | `retail` | target schema |
 | `AUTH_MODE` | `aad_token` | `aad_token` (workspace identity) or `sql` |
 | `KEY_VAULT_URL` / `SQL_SECRET_NAME` | – | Key Vault-backed SQL password (SQL auth) |
-| `WRITE_FORMAT` | `com.microsoft.sqlserver.jdbc.spark` | MSSQL Spark connector (BULK COPY); set to `jdbc` for the portable fallback |
+| `WRITE_FORMAT` | `jdbc` | column-list INSERT (honors IDENTITY PKs + `loaded_at` default). See caveat below before using the BULK COPY connector |
 | `BATCH_SIZE` | `100000` | insert batch size |
 | `MAX_ROWS_PER_WRITE` | `20000000` | chunk size for AAD long-load token refresh (0 disables) |
 | `WRITE_PARTITIONS` | `0` | optional repartition per write (0 = leave as-is) |
@@ -122,9 +122,17 @@ bulk-writes to Azure SQL in **foreign-key-safe order**.
 ### Scale
 
 `fact_receipt_lines` (~182M) and the inventory ledgers (~180M each) dominate
-runtime. The notebook defaults to `WRITE_FORMAT=com.microsoft.sqlserver.jdbc.spark`
-(MSSQL Spark connector, BULK COPY, 10-100x faster than generic JDBC). Set
-`WRITE_FORMAT=jdbc` if the connector is not on the Spark pool.
+runtime. The notebook uses `WRITE_FORMAT=jdbc` (batched column-list INSERTs) so
+that the server generates the `BIGINT IDENTITY` surrogate PKs and fills the
+`loaded_at` default — columns the source DataFrames intentionally omit.
+
+The MSSQL Spark connector (`com.microsoft.sqlserver.jdbc.spark`, BULK COPY) is
+faster but does **not** work against this schema as-is: BULK COPY requires the
+DataFrame to supply the full target column set, so it fails on the IDENTITY and
+`loaded_at` columns (`NoSuchElementException: key not found: loaded_at`). Only
+switch to it if you first extend the transforms to emit every non-default column.
+Throughput on `jdbc` is driven by `BATCH_SIZE` and `WRITE_PARTITIONS` (more
+partitions = more parallel connections).
 
 ### Long loads and AAD token expiry
 
