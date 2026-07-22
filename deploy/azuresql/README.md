@@ -117,9 +117,12 @@ and `AZURE_SQL_DATABASE` must be supplied — the run asserts on them.
 ### Idempotency / reload
 
 * Convert cents to dollars in-transform: `amount = cents / 100.0`.
-* With `TRUNCATE_BEFORE_LOAD=true` the notebook disables FK enforcement,
-  `DELETE`s all targets (child -> parent), loads, then re-enables the FKs. Safe
-  to re-run for a clean full reload.
+* With `TRUNCATE_BEFORE_LOAD=true` the notebook drops the FK constraints
+  (saving their definitions to `retail._fk_backup`), `TRUNCATE`s every target,
+  loads, then recreates the FKs `WITH NOCHECK` (untrusted, no validation scan).
+  `TRUNCATE` is used instead of `DELETE` because a plain delete on the 100M+ row
+  fact tables is I/O-bound and can run for hours on this Azure SQL tier. Safe to
+  re-run for a clean full reload.
 * Business keys for future upsert work: `sales.receipt_id`,
   `online_orders.order_id`, `sale_lines (receipt_id, line_number)`,
   `online_order_lines (order_id, line_number)`.
