@@ -105,6 +105,7 @@ bulk-writes to Azure SQL in **foreign-key-safe order**.
 | `MAX_ROWS_PER_WRITE` | `20000000` | chunk size for AAD long-load token refresh (0 disables) |
 | `WRITE_PARTITIONS` | `0` | optional repartition per write (0 = leave as-is) |
 | `TRUNCATE_BEFORE_LOAD` | `true` | full-reload: clear targets first |
+| `LOADED_AT` | *(run time)* | override the batch load timestamp (UTC `yyyy-mm-dd hh:mm:ss.fff`) |
 | `ONLY_TABLES` | *(all)* | comma-separated subset of OLTP tables |
 
 ### Idempotency / reload
@@ -118,6 +119,10 @@ bulk-writes to Azure SQL in **foreign-key-safe order**.
   `online_order_lines (order_id, line_number)`.
 * Event-grain tables (inventory, reorders, stockouts, shipment_*) have no
   natural key and are loaded append-only.
+* `loaded_at` is stamped by the ETL with a single UTC batch timestamp computed
+  once per run (all rows of a run share one value), so it marks the load batch
+  rather than per-row insert time. Override with `LOADED_AT` for reproducible
+  re-runs.
 
 ### Scale
 
