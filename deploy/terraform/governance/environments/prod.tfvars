@@ -11,14 +11,14 @@ domain_name   = "Retail"
 assign_domain = false
 
 group_user_members = {
-  platform-admins = ["00000000-0000-0000-0000-000000000000"]
-  data-eng        = ["00000000-0000-0000-0000-000000000000"]
-  data-sci        = ["00000000-0000-0000-0000-000000000000"]
-  analysts        = ["00000000-0000-0000-0000-000000000000"]
-  report-users    = ["00000000-0000-0000-0000-000000000000"]
+  platform-admins = ["57d5057f-41c8-4327-8da7-3aebcbb5ae11", "62283ea1-aa5f-428a-a425-6e10555f830b"]
+  data-eng        = ["57d5057f-41c8-4327-8da7-3aebcbb5ae11", "62283ea1-aa5f-428a-a425-6e10555f830b"]
+  data-sci        = ["57d5057f-41c8-4327-8da7-3aebcbb5ae11", "62283ea1-aa5f-428a-a425-6e10555f830b"]
+  analysts        = ["57d5057f-41c8-4327-8da7-3aebcbb5ae11", "62283ea1-aa5f-428a-a425-6e10555f830b"]
+  report-users    = ["57d5057f-41c8-4327-8da7-3aebcbb5ae11", "62283ea1-aa5f-428a-a425-6e10555f830b"]
 }
 
 group_sp_members = {
-  ai-apps   = ["00000000-0000-0000-0000-000000000000"]
-  deploy-sp = ["00000000-0000-0000-0000-000000000000"]
+  ai-apps   = ["2591597e-95bd-47b2-8559-0228f50035b7"]
+  deploy-sp = ["f1bdbcf3-da75-45cc-aed9-a0c06c87d089"]
 }

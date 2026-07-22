@@ -9,18 +9,22 @@ skip_capacity_state_validation = false
 domain_name   = "Retail"
 assign_domain = true
 
-# Entra group membership. Replace the placeholder object IDs with real GUIDs.
-# These are tenant facts, not committed code - keep real values out of version
-# control (e.g. supply via a local override or the CI secret store).
+# Entra group membership (ContosoVVS2 / MngEnvMCAP245699 tenant). Object IDs are
+# directory GUIDs, not secrets. Users:
+#   57d5057f-... = System Administrator (admin@MngEnvMCAP245699.onmicrosoft.com)
+#   62283ea1-... = Vytas Suopys (vysuopys_microsoft.com)
 group_user_members = {
-  platform-admins = ["00000000-0000-0000-0000-000000000000"]
-  data-eng        = ["00000000-0000-0000-0000-000000000000"]
-  data-sci        = ["00000000-0000-0000-0000-000000000000"]
-  analysts        = ["00000000-0000-0000-0000-000000000000"]
-  report-users    = ["00000000-0000-0000-0000-000000000000"]
+  platform-admins = ["57d5057f-41c8-4327-8da7-3aebcbb5ae11", "62283ea1-aa5f-428a-a425-6e10555f830b"]
+  data-eng        = ["57d5057f-41c8-4327-8da7-3aebcbb5ae11", "62283ea1-aa5f-428a-a425-6e10555f830b"]
+  data-sci        = ["57d5057f-41c8-4327-8da7-3aebcbb5ae11", "62283ea1-aa5f-428a-a425-6e10555f830b"]
+  analysts        = ["57d5057f-41c8-4327-8da7-3aebcbb5ae11", "62283ea1-aa5f-428a-a425-6e10555f830b"]
+  report-users    = ["57d5057f-41c8-4327-8da7-3aebcbb5ae11", "62283ea1-aa5f-428a-a425-6e10555f830b"]
 }
 
+# Service-principal (enterprise application) object IDs.
+#   2591597e-... = retail-demo-crossauth (AI application SP)
+#   f1bdbcf3-... = retail-demo-dev       (CI/CD deploy SP)
 group_sp_members = {
-  ai-apps   = ["00000000-0000-0000-0000-000000000000"] # AI application SP object ID(s)
-  deploy-sp = ["00000000-0000-0000-0000-000000000000"] # CI/CD deploy SP object ID(s)
+  ai-apps   = ["2591597e-95bd-47b2-8559-0228f50035b7"]
+  deploy-sp = ["f1bdbcf3-da75-45cc-aed9-a0c06c87d089"]
 }

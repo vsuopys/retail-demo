@@ -69,9 +69,10 @@ terraform apply -var-file="environments\dev.tfvars"
 ```
 
 Fill the placeholder object IDs in `environments\dev.tfvars` with real user / SP
-GUIDs first. Keep real object IDs out of version control (local override file or
-CI secret store). Stand up `test` / `prod` later with their own tfvars - no code
-changes needed.
+GUIDs first. Entra object IDs are directory GUIDs, not secrets, so they are
+committed for this demo tenant; if you prefer to keep them out of version
+control, move them to a local override file or the CI secret store. Stand up
+`test` / `prod` later with their own tfvars - no code changes needed.
 
 ## Domain strategy across environments
 
