@@ -1,0 +1,18 @@
+{
+  "properties": {
+    "source": {
+      "type": "AzureSqlDatabase",
+      "typeProperties": {
+        "connection": "{{ .ConnectionId }}",
+        "database": "{{ .Database }}"
+      }
+    },
+    "target": {
+      "type": "MountedRelationalDatabase",
+      "typeProperties": {
+        "defaultSchema": "{{ .DefaultSchema }}",
+        "format": "Delta"
+      }
+    }
+  }
+}

@@ -28,3 +28,23 @@ group_sp_members = {
   ai-apps   = ["2591597e-95bd-47b2-8559-0228f50035b7"]
   deploy-sp = ["f1bdbcf3-da75-45cc-aed9-a0c06c87d089"]
 }
+
+# --- Azure SQL -> Fabric Mirroring (bronze) -----------------------------------
+# Opt-in. Flip sql_mirroring_enabled to true after completing the source-side
+# prerequisites (see governance/README.md "SQL mirroring"):
+#   1. Enable the system-assigned managed identity on retail-erp-demo-sql.
+#   2. Create the connection SP as a SQL user on hallmarkerp
+#      (mirroring/grant-sp-sql-user.sql).
+#   3. Provide the SP secret via TF_VAR_mirror_sp_client_secret (never here).
+# Non-secret source facts (server/database/schema) are safe to commit; the SP
+# client id is not a secret but the secret must stay out of source control.
+sql_mirroring_enabled = false
+
+mirror_sql_server    = "retail-erp-demo-sql.database.windows.net"
+mirror_sql_database  = "hallmarkerp"
+mirror_source_schema = "retail"
+
+# mirror_sp_client_id                  = "<app registration client id>"
+# mirror_sp_tenant_id                  = "bf3237ff-ecce-4a82-8130-bef8d9453c84"  # defaults to tenant_id
+# mirror_sql_server_identity_object_id = "<retail-erp-demo-sql managed identity object id>"
+# Secret: setx / $env:TF_VAR_mirror_sp_client_secret before apply.

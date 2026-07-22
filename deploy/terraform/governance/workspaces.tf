@@ -30,4 +30,11 @@ resource "fabric_lakehouse" "layer" {
   configuration = {
     enable_schemas = true
   }
+
+  # Schema-enabled lakehouse provisioning can exceed the provider's default
+  # create timeout when several are created in parallel (observed context
+  # deadline at ~10m); allow more headroom.
+  timeouts = {
+    create = "30m"
+  }
 }

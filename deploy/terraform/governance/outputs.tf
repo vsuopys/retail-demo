@@ -27,3 +27,18 @@ output "domain_id" {
   value       = var.assign_domain ? fabric_domain.retail[0].id : null
   description = "Fabric Retail domain ID (null when assign_domain is false)."
 }
+
+output "mirrored_database_id" {
+  value       = local.sql_mirroring_enabled ? fabric_mirrored_database.sql_mirror[0].id : null
+  description = "Fabric Mirrored Database item ID in the bronze workspace (null when sql_mirroring_enabled is false)."
+}
+
+output "mirrored_database_onelake_tables_path" {
+  value       = local.sql_mirroring_enabled ? fabric_mirrored_database.sql_mirror[0].properties.onelake_tables_path : null
+  description = "OneLake Tables path of the mirrored database - target for bronze->silver shortcuts."
+}
+
+output "mirror_connection_id" {
+  value       = local.sql_mirroring_enabled ? fabric_connection.sql_mirror[0].id : null
+  description = "Fabric cloud connection ID to the source Azure SQL database (null when sql_mirroring_enabled is false)."
+}

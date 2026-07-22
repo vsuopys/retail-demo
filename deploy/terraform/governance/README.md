@@ -19,6 +19,7 @@ succeeds with the old workspace absent.
 | 4 Lakehouses | One per layer (`bronze_lh`, `silver_lh`, `gold_lh`, `ds_lh`) - **empty**; each layer physically owns its tables (D2) |
 | Fabric domain | `Retail`, with the four workspaces assigned (preview resources) |
 | Workspace role assignments | Least-privilege RBAC matrix (below), groups only - never users |
+| Azure SQL mirroring (optional) | Connection + Mirrored Database in bronze (all tables), when `sql_mirroring_enabled` - see below |
 
 ### RBAC matrix
 
@@ -41,7 +42,8 @@ access is wired in Phase 4 (item sharing / OneLake, and Power BI App audiences).
 - No data-copy logic. Lakehouses are created empty; data lands in Phase 3
   (`retail-setup` generation, or a one-off read-only copy runbook - outside IaC).
 - No workload items (notebooks, semantic model, data agents, eventhouses). Those
-  deploy per-workspace via `fabric-cicd` in Phase 3/6.
+  deploy per-workspace via `fabric-cicd` in Phase 3/6. (Exception: the optional
+  Azure SQL Mirrored Database below, which is opt-in and off by default.)
 - No reference to `retail-demo-dev` (immutability constraint).
 
 ## Prerequisites
@@ -90,8 +92,55 @@ Set `delegate_domain_admin = true` to grant the `platform-admins` group the
 `Admins` role on the `Retail` domain (`fabric_domain_role_assignments`). Off by
 default.
 
+## Optional: Azure SQL mirroring into bronze
+
+Set `sql_mirroring_enabled = true` to replicate the retail OLTP database (Azure
+SQL) into `retail-bronze-<env>` as a Fabric **Mirrored Database**. The **entire
+database is mirrored** - `mirroring/mirroring.json.tmpl` omits `mountedTables`,
+so Fabric replicates every table and auto-adds new ones. Data lands in OneLake as
+Delta under the source schema (`mirror_source_schema`, default `retail`).
+
+Resources created when enabled (`mirroring.tf`):
+
+| Resource | Detail |
+|----------|--------|
+| `fabric_connection.sql_mirror` | Cloud connection (`type = SQL`) to `mirror_sql_server` / `mirror_sql_database`, Service Principal auth |
+| `fabric_mirrored_database.sql_mirror` | Mirrored Database item in the bronze workspace, all tables, Delta |
+| `fabric_workspace_role_assignment.sql_server_identity` | Optional - grants the SQL server managed identity `Contributor` on bronze (only when `mirror_sql_server_identity_object_id` is set) |
+
+**Source-side prerequisites** (not managed by Terraform - Fabric mirroring
+requirements):
+
+1. **Enable the system-assigned managed identity** on the Azure SQL logical
+   server (`retail-erp-demo-sql`).
+2. **Create the connection SP as a SQL user** on the source database - run
+   [`mirroring/grant-sp-sql-user.sql`](mirroring/grant-sp-sql-user.sql) once,
+   connected as an Entra admin. The connection test authenticates as this SP.
+3. **Let Fabric write the mirror**: grant the SQL server managed identity
+   Read+Write on the mirrored database. Set `mirror_sql_server_identity_object_id`
+   to automate the workspace-role grant, or grant it in the Fabric portal.
+
+**Credentials.** The SP **client secret is write-only** and must be supplied
+outside Terraform - it is never stored in state or committed:
+
+```powershell
+$env:TF_VAR_mirror_sp_client_secret = "<sp client secret>"
+terraform apply -var-file="environments\dev.tfvars" -var="sql_mirroring_enabled=true" `
+  -var="mirror_sp_client_id=<app client id>"
+```
+
+Non-secret source facts (`mirror_sql_server`, `mirror_sql_database`,
+`mirror_source_schema`) are set in `dev.tfvars`. The SP client id is not a secret
+but is left commented there; the secret must stay out of source control. Rotate
+the secret by incrementing `mirror_sp_client_secret_version` (write-only values
+are not diffable). After apply, wire bronze->silver shortcuts to
+`mirrored_database_onelake_tables_path`.
+
 ## Outputs
 
 `workspace_ids`, `workspace_names`, `lakehouse_ids`, `lakehouse_names`,
 `group_object_ids`, `domain_id` - keyed by layer / group. These feed downstream
 `fabric-cicd` per-workspace `parameter.yml` find/replace and Phase 4/5 wiring.
+When mirroring is enabled, `mirrored_database_id`,
+`mirrored_database_onelake_tables_path`, and `mirror_connection_id` are also
+emitted (else `null`).
