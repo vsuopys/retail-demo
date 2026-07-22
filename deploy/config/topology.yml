@@ -1,0 +1,82 @@
+# Governance topology — single source of truth for the medallion re-architecture.
+#
+# This file is ADDITIVE and environment-invariant. It describes the target
+# governed topology (layers, domain, groups, RBAC matrix, item->layer map) that
+# the multi-workspace deployment consumes. It does NOT change the existing
+# single-workspace deploy path (deploy.yml + environments/*.yml), which remains
+# the active deployment mechanism today.
+#
+# Hard boundary: nothing here references `retail-demo-dev`. Target workspace
+# names are DERIVED from `workspace_name_pattern` + (layer, env), so the immutable
+# workspace can never match a target by construction. A clean deploy must succeed
+# with `retail-demo-dev` absent.
+#
+# See docs/design/architecture/governance-topology.md for the narrative,
+# diagram, and IaC scope boundary. The Terraform that provisions the workspaces,
+# groups, domain, and RBAC lives in deploy/terraform/governance/.
+
+domain:
+  name: Retail
+  description: Retail medallion domain (bronze/silver/gold/ds-sandbox).
+  admin_group: sg-fabric-retail-platform-admins
+
+capacity:
+  # D3: a single shared Fabric capacity for all layers and environments; cost is
+  # attributed per-workspace via the Fabric Chargeback app (Phase 5).
+  name: fabricdemovvs
+
+# D2: each layer physically owns its curated tables in its own lakehouse.
+layers:
+- bronze
+- silver
+- gold
+- ds-sandbox
+
+# D1: implement dev first; test/prod use the same pattern with a different env.
+environments:
+- dev
+- test
+- prod
+
+# The immutable workspace never matches this pattern for any (layer, env).
+workspace_name_pattern: "retail-{layer}-{env}"
+
+# Entra security groups (Phase 1). Object IDs are resolved at deploy time from
+# these display names (azuread data source); never hard-coded here.
+groups:
+  platform-admins: sg-fabric-retail-platform-admins
+  data-eng: sg-fabric-retail-data-eng
+  data-sci: sg-fabric-retail-data-sci
+  analysts: sg-fabric-retail-analysts
+  ai-apps: sg-fabric-retail-ai-apps
+  report-users: sg-fabric-retail-report-users
+  deploy-sp: sg-fabric-retail-deploy-sp
+
+# Least-privilege RBAC matrix: layer -> { group -> Fabric workspace role }.
+# Roles: Admin | Member | Contributor | Viewer. Omit a group to grant NO role.
+# ai-apps and report-users are intentionally absent from every layer: ai-apps
+# receives item-level / OneLake grants and report-users a Power BI App audience
+# (D4), neither of which is a workspace role. This mirrors the Terraform
+# rbac_matrix in deploy/terraform/governance/rbac.tf.
+rbac:
+  bronze:
+    platform-admins: Admin
+    data-eng: Member
+    deploy-sp: Admin
+  silver:
+    platform-admins: Admin
+    data-eng: Member
+    data-sci: Viewer
+    analysts: Viewer
+    deploy-sp: Admin
+  gold:
+    platform-admins: Admin
+    data-eng: Contributor
+    data-sci: Viewer
+    analysts: Contributor
+    deploy-sp: Admin
+  ds-sandbox:
+    platform-admins: Admin
+    data-eng: Viewer
+    data-sci: Member
+    deploy-sp: Admin

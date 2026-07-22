@@ -1,0 +1,33 @@
+# DS sandbox layer overlay — experimentation and ML.
+#
+# Additive overlay consumed alongside topology.yml. Workspace name is derived as
+# retail-ds-sandbox-<env>. The sandbox reads silver + gold via read-only OneLake
+# shortcuts and writes only to its own ds_lh (D2), isolating experimentation cost
+# on its own workspace (chargeback boundary, D3).
+
+layer: ds-sandbox
+
+lakehouse:
+  name: ds_lh
+  enable_schemas: true
+
+clickstream:
+  enabled: false
+
+deployment:
+  item_types_in_scope:
+  - Lakehouse
+  - Notebook
+  - MLExperiment
+  - DataPipeline
+
+shortcuts:
+  # Read-only reads; the sandbox never writes upstream layers.
+  reads:
+  - silver
+  - gold
+
+items:
+  ml_notebooks: fabric/lakehouse/  # 06-ml-demand-forecast.ipynb .. 14-ml-dynamic-pricing.ipynb
+  ml_orchestration: fabric/pipelines/machine-learning.DataPipeline
+  reset: fabric/lakehouse/99-reset-lakehouse.ipynb

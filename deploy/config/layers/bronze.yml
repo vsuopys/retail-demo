@@ -1,0 +1,51 @@
+# Bronze layer overlay — raw landing, real-time ingestion, event stores.
+#
+# Additive: consumed by the future multi-workspace deployment alongside
+# topology.yml. Does not affect the current single-workspace deploy path.
+# Workspace name is derived as retail-bronze-<env> (topology.workspace_name_pattern).
+
+layer: bronze
+
+lakehouse:
+  name: bronze_lh
+  enable_schemas: true
+
+eventhouse:
+  name: retail_eventhouse
+  kql_database_name: retail_eventhouse
+  kql_scripts:
+  - 01-create-tables.kql
+  - 02-create-ingestion-mappings.kql
+  - 03-create-functions.kql
+  - 04-create-materialized-views.kql
+  - 06-ml-anomaly-detection.kql
+  - 07-pricing-approval-tables.kql
+
+# Clickstream real-time path is owned by bronze only.
+clickstream:
+  enabled: true
+
+# Item types this layer publishes via fabric-cicd (narrowed per layer).
+deployment:
+  item_types_in_scope:
+  - Lakehouse
+  - Notebook
+  - KQLQueryset
+  - DataPipeline
+
+# Repo items owned by this layer (item -> path). Source of truth for staging.
+items:
+  eventhouse_kql: fabric/kql_database/
+  clickstream: deploy/terraform/clickstream.tf
+  stream_generator: utility/notebooks/stream-events.ipynb
+  clickstream_generator: utility/notebooks/clickstream-generator.ipynb
+  bronze_shortcuts: fabric/lakehouse/01-create-bronze-shortcuts.ipynb
+  historical_raw_load: fabric/lakehouse/02-historical-data-load.ipynb
+  ingestion_pipelines:
+  - fabric/pipelines/historical-data-load.DataPipeline
+  - fabric/pipelines/streaming-data-load.DataPipeline
+  querysets: fabric/querysets/
+  dashboards:
+  - fabric/dashboards/retail-ops.template.json
+  - fabric/dashboards/pricing-approval.template.json
+  dictionary_seeds: utility/notebooks/setup-01-seed-dictionaries.ipynb

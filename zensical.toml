@@ -90,6 +90,7 @@ nav = [
     { "Architecture" = [
       { "Overview" = "design/architecture/overview.md" },
       { "Infrastructure" = "design/architecture/infrastructure.md" },
+      { "Governance topology" = "design/architecture/governance-topology.md" },
       { "Data flow" = "design/architecture/data-flow.md" },
       { "Data schema" = "design/architecture/data-schema.md" },
       { "Security boundaries" = "design/architecture/security.md" },

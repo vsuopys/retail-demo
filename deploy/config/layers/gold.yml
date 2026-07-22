@@ -1,0 +1,46 @@
+# Gold layer overlay — aggregates, Direct Lake semantic model, data agents,
+# reporting.
+#
+# Additive overlay consumed alongside topology.yml. Workspace name is derived as
+# retail-gold-<env>. Gold reads silver via OneLake shortcuts, physically owns its
+# aggregates (D2), and hosts the semantic model + Power BI App (D4).
+
+layer: gold
+
+lakehouse:
+  name: gold_lh
+  enable_schemas: true
+
+clickstream:
+  enabled: false
+
+deployment:
+  item_types_in_scope:
+  - Lakehouse
+  - Notebook
+  - SemanticModel
+  - Report
+  - DataPipeline
+  - DataAgent
+
+powerbi:
+  semantic_model_name: retail_model
+  report_name: retail_model
+  # Direct Lake model is rebound to gold_lh at deploy time (Phase 3 migration
+  # runbook / deployment rules).
+  direct_lake_lakehouse: gold_lh
+  # D4: report-users consume via a Power BI App audience, not a workspace role.
+  app_audience_group: sg-fabric-retail-report-users
+
+shortcuts:
+  reads:
+  - silver
+
+items:
+  streaming_to_gold: fabric/lakehouse/04-streaming-to-gold.ipynb
+  gold_aggregates: utility/notebooks/setup-04-build-gold.ipynb
+  semantic_model: fabric/powerbi/retail_model.SemanticModel
+  report: fabric/powerbi/retail_model.Report
+  data_agent: fabric/data-agents/retail-semantic-model-agent.DataAgent
+  ontology: fabric/lakehouse/30-create-ontology.ipynb
+  maintenance_pipeline: fabric/pipelines/daily-maintenance.DataPipeline

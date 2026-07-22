@@ -1,0 +1,36 @@
+# Silver layer overlay — cleansed / conformed dimensions and facts.
+#
+# Additive overlay consumed alongside topology.yml. Workspace name is derived as
+# retail-silver-<env>. Silver reads bronze via OneLake shortcuts and physically
+# owns its conformed tables (D2).
+
+layer: silver
+
+lakehouse:
+  name: silver_lh
+  enable_schemas: true
+
+# No eventhouse / clickstream in silver.
+clickstream:
+  enabled: false
+
+deployment:
+  item_types_in_scope:
+  - Lakehouse
+  - Notebook
+  - DataPipeline
+
+# Cross-layer reads (created by deploy.scripts.configure_shortcuts, not IaC copy).
+shortcuts:
+  reads:
+  - bronze
+
+items:
+  streaming_to_silver: fabric/lakehouse/03-streaming-to-silver.ipynb
+  historical_dimensions: utility/notebooks/setup-02-generate-dimensions.ipynb
+  historical_facts: utility/notebooks/setup-03-generate-facts.ipynb
+  augment_dedupe_receipts: fabric/lakehouse/90-augment-and-dedupe-receipts.ipynb
+  delta_maintenance: fabric/lakehouse/05-maintain-delta-tables.ipynb
+  reverse_etl:
+  - fabric/lakehouse/50-silver-to-azuresql-oltp.ipynb
+  - fabric/lakehouse/51-silver-to-blob-csv.ipynb
