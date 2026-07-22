@@ -108,8 +108,8 @@ and `AZURE_SQL_DATABASE` must be supplied — the run asserts on them.
 | `KEY_VAULT_URL` / `SQL_SECRET_NAME` | – | Key Vault-backed SQL password (SQL auth) |
 | `WRITE_FORMAT` | `jdbc` | column-list INSERT (honors IDENTITY PKs + `loaded_at` default). See caveat below before using the BULK COPY connector |
 | `BATCH_SIZE` | `100000` | insert batch size |
-| `MAX_ROWS_PER_WRITE` | `20000000` | chunk size for AAD long-load token refresh (0 disables) |
-| `WRITE_PARTITIONS` | `0` | optional repartition per write (0 = leave as-is) |
+| `MAX_ROWS_PER_WRITE` | `5000000` | chunk size for AAD long-load token refresh (0 disables) |
+| `WRITE_PARTITIONS` | `8` | concurrent JDBC connections per write (0 = leave as-is) |
 | `TRUNCATE_BEFORE_LOAD` | `true` | full-reload: clear targets first |
 | `LOADED_AT` | *(run time)* | override the batch load timestamp (UTC `yyyy-mm-dd hh:mm:ss.fff`) |
 | `ONLY_TABLES` | *(all)* | comma-separated subset of OLTP tables |
@@ -145,8 +145,26 @@ faster but does **not** work against this schema as-is: BULK COPY requires the
 DataFrame to supply the full target column set, so it fails on the IDENTITY and
 `loaded_at` columns (`NoSuchElementException: key not found: loaded_at`). Only
 switch to it if you first extend the transforms to emit every non-default column.
-Throughput on `jdbc` is driven by `BATCH_SIZE` and `WRITE_PARTITIONS` (more
-partitions = more parallel connections).
+Throughput on `jdbc` is driven by `BATCH_SIZE` and `WRITE_PARTITIONS`. More
+partitions = more parallel connections, but too many overwhelm a small Azure SQL
+tier: the parallel bulk inserts pile up on `LATCH_SH` and the server starts
+dropping connections (`SQLServerException: The connection is closed`), aborting
+the Spark job. `WRITE_PARTITIONS=8` is a safe default; raise it on larger vCore
+tiers, lower it (e.g. `4`) if connections still drop.
+
+### Resilience (connection drops and retries)
+
+Two layers guard against transient connection drops:
+
+* The JDBC URL sets `connectRetryCount`/`connectRetryInterval`, so the SQL Server
+  driver transparently reconnects a broken idle connection, and raw connection
+  opens (used for the reset/FK DDL) are retried with exponential backoff.
+* Each table load is wrapped in a retry-with-backoff: on a transient write
+  failure the target is `TRUNCATE`d and the write is retried. This is
+  duplicate-safe because tables load in FK-safe (parent -> child) order with FK
+  enforcement off, so nothing references the table being written yet. A blanket
+  retry of the whole `save()` is intentionally **not** used — Spark commits
+  per-partition, so re-running a partially-succeeded write would duplicate rows.
 
 ### Long loads and AAD token expiry
 
