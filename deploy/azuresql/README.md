@@ -240,3 +240,15 @@ part files; the notebook's RUN cell then prints a generated per-file loader (one
 CSV caveat: `BULK INSERT` with `FORMAT='CSV'` does not reliably handle line breaks
 embedded inside quoted text fields. The synthetic data does not contain them, but
 keep it in mind if the source ever changes.
+
+**Resetting for a clean reload.** To wipe the target tables before a full refresh,
+run `deploy/azuresql/bulk-load/11-reset-tables.sql`. `TRUNCATE` is minimally logged
+(far faster than `DELETE` on the 100M+ fact tables) but SQL Server refuses to
+truncate a table referenced by a foreign key, so the script first drops every
+`retail.*` FK (dynamically, by name), then truncates all 16 tables. After loading,
+re-run `deploy/azuresql/schema/05-foreign-keys.sql` to restore and validate the FKs.
+Full-refresh sequence:
+
+```
+11-reset-tables.sql   ->   notebook 51 (export)   ->   10-bulk-load.sql   ->   ../schema/05-foreign-keys.sql
+```
