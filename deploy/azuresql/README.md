@@ -100,8 +100,10 @@ bulk-writes to Azure SQL in **foreign-key-safe order**.
 | `TARGET_SCHEMA` | `retail` | target schema |
 | `AUTH_MODE` | `aad_token` | `aad_token` (workspace identity) or `sql` |
 | `KEY_VAULT_URL` / `SQL_SECRET_NAME` | – | Key Vault-backed SQL password (SQL auth) |
-| `WRITE_FORMAT` | `jdbc` | `jdbc`, or `com.microsoft.sqlserver.jdbc.spark` (BULK COPY) |
-| `BATCH_SIZE` | `10000` | JDBC insert batch size |
+| `WRITE_FORMAT` | `com.microsoft.sqlserver.jdbc.spark` | MSSQL Spark connector (BULK COPY); set to `jdbc` for the portable fallback |
+| `BATCH_SIZE` | `100000` | insert batch size |
+| `MAX_ROWS_PER_WRITE` | `20000000` | chunk size for AAD long-load token refresh (0 disables) |
+| `WRITE_PARTITIONS` | `0` | optional repartition per write (0 = leave as-is) |
 | `TRUNCATE_BEFORE_LOAD` | `true` | full-reload: clear targets first |
 | `ONLY_TABLES` | *(all)* | comma-separated subset of OLTP tables |
 
@@ -120,6 +122,22 @@ bulk-writes to Azure SQL in **foreign-key-safe order**.
 ### Scale
 
 `fact_receipt_lines` (~182M) and the inventory ledgers (~180M each) dominate
-runtime. For large loads set `WRITE_FORMAT=com.microsoft.sqlserver.jdbc.spark`
-to use the MSSQL Spark connector's BULK COPY path (10-100x faster than generic
-JDBC) when the connector is available on the Spark pool.
+runtime. The notebook defaults to `WRITE_FORMAT=com.microsoft.sqlserver.jdbc.spark`
+(MSSQL Spark connector, BULK COPY, 10-100x faster than generic JDBC). Set
+`WRITE_FORMAT=jdbc` if the connector is not on the Spark pool.
+
+### Long loads and AAD token expiry
+
+An AAD access token lives ~60-75 min. A **single** `write()` that runs longer
+than that fails mid-load with `Login failed ... Token is expired`, because Spark
+opens new executor connections throughout the write and any connection opened
+after the token expires is rejected.
+
+The notebook avoids this under `AUTH_MODE=aad_token` by splitting any table above
+`MAX_ROWS_PER_WRITE` into deterministic hash chunks and **re-acquiring a fresh
+token before each chunk**, so no single connection outlives its token. Chunks are
+keyed by a row hash, so a source re-scan never duplicates or drops rows. Tune
+`MAX_ROWS_PER_WRITE` down if a chunk still approaches the token lifetime.
+
+`AUTH_MODE=sql` (Key Vault password) has no token to expire and needs no
+chunking — prefer it if SQL authentication is enabled on the server.
