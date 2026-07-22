@@ -191,7 +191,7 @@ chunking — prefer it if SQL authentication is enabled on the server.
 
 The row-by-row JDBC path above is resilient but slow for the 100M+ row fact
 tables. A faster, set-based alternative stages the data as CSV in Azure Blob
-Storage and loads it with `OPENROWSET(BULK ...)`:
+Storage and loads it with `BULK INSERT`:
 
 ```
 retail_lakehouse.silver.*  ->  <container>/<prefix>/<table>.csv  ->  retail.*
@@ -203,17 +203,28 @@ retail_lakehouse.silver.*  ->  <container>/<prefix>/<table>.csv  ->  retail.*
   **exact same transforms as notebook 50** (imported verbatim, so the two never
   drift) and writes RFC4180 CSV to blob. Each file holds every OLTP column except
   the `IDENTITY` surrogate PK (the server assigns it on load), in DDL order with
-  `loaded_at` last; `BIT` columns are emitted as `0`/`1`. Authenticate with a SAS
-  token (`BLOB_SAS`) or account key (`BLOB_ACCOUNT_KEY`); set `BLOB_ACCOUNT`,
+  `loaded_at` last; `BIT` columns are emitted as `0`/`1`. Set `BLOB_ACCOUNT`,
   `BLOB_CONTAINER`, and optionally `BLOB_PREFIX` (default `oltp-export`),
-  `ONLY_TABLES`, and `LOADED_AT`.
+  `ONLY_TABLES`, and `LOADED_AT`. `AUTH_METHOD` selects how Spark authenticates
+  to the storage account: `aad` (default, uses the running user's AAD identity via
+  Fabric passthrough — no secret needed, requires Storage Blob Data RBAC), `sas`
+  (`BLOB_SAS`), or `key` (`BLOB_ACCOUNT_KEY`). AAD passthrough is required for
+  HNS/ADLS Gen2 accounts that have shared-key access disabled.
 * **`deploy/azuresql/bulk-load/10-bulk-load.sql`** creates the SAS-scoped
-  `DATABASE SCOPED CREDENTIAL` + `EXTERNAL DATA SOURCE`, then runs one
-  `INSERT ... SELECT ... FROM OPENROWSET(BULK '<table>.csv', FORMAT='CSV', ...)`
-  per table in FK-safe order. Replace `__BLOB_URL__` (container URL) and
-  `__SAS_TOKEN__` (read/list SAS, no leading `?`) before running. The `WITH (...)`
+  `DATABASE SCOPED CREDENTIAL` + `EXTERNAL DATA SOURCE`, then for each table (in
+  FK-safe order) bulk-loads the CSV into a `#stg_<table>` temp table via
+  `BULK INSERT ... FROM '<table>.csv' WITH (FORMAT='CSV', ...)` and copies it into
+  the real table with `INSERT ... SELECT` (so the `IDENTITY` surrogate PK is
+  assigned by the server). Replace `__BLOB_URL__` (container URL) and
+  `__SAS_TOKEN__` (read/list SAS, no leading `?`) before running. The staging
   column types and the CSV column order are both generated from
   `deploy/azuresql/schema/*.sql`, so they stay aligned.
+
+Why `BULK INSERT` (not `OPENROWSET`): Azure SQL DB does not support
+`OPENROWSET(BULK ...)` with a `WITH (schema)` clause for `FORMAT='CSV'` over an
+`https://` data source — that is a Synapse serverless feature. `BULK INSERT` into
+a staging temp table is the supported CSV path, and staging keeps IDENTITY PKs
+intact.
 
 Why blob (not OneLake): Azure SQL DB's bulk APIs can only read from Azure Blob
 Storage via a SAS-scoped external data source — they cannot read OneLake (which
@@ -221,11 +232,11 @@ needs AAD).
 
 **Scale note.** `SINGLE_FILE=True` (default) writes one `<table>.csv` per table —
 simplest to load with the committed static SQL and ideal for testing a subset via
-`ONLY_TABLES`. Azure SQL DB `OPENROWSET(BULK)` reads **one file per statement**
+`ONLY_TABLES`. Azure SQL DB `BULK INSERT` reads **one file per statement**
 (no wildcards), so for very large tables set `SINGLE_FILE=False` to write parallel
 part files; the notebook's RUN cell then prints a generated per-file loader (one
-`INSERT ... OPENROWSET` per part) to run after the setup section.
+`BULK INSERT` per part) to run after the setup section.
 
-CSV caveat: `OPENROWSET FORMAT='CSV'` with `PARSER_VERSION='2.0'` does not reliably
-handle line breaks embedded inside quoted text fields. The synthetic data does not
-contain them, but keep it in mind if the source ever changes.
+CSV caveat: `BULK INSERT` with `FORMAT='CSV'` does not reliably handle line breaks
+embedded inside quoted text fields. The synthetic data does not contain them, but
+keep it in mind if the source ever changes.
