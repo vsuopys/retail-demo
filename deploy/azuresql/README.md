@@ -108,7 +108,7 @@ and `AZURE_SQL_DATABASE` must be supplied — the run asserts on them.
 | `KEY_VAULT_URL` / `SQL_SECRET_NAME` | – | Key Vault-backed SQL password (SQL auth) |
 | `WRITE_FORMAT` | `jdbc` | column-list INSERT (honors IDENTITY PKs + `loaded_at` default). See caveat below before using the BULK COPY connector |
 | `BATCH_SIZE` | `100000` | insert batch size |
-| `MAX_ROWS_PER_WRITE` | `5000000` | chunk size for AAD long-load token refresh (0 disables) |
+| `MAX_ROWS_PER_WRITE` | `1000000` | chunk size for AAD long-load token refresh + small-tier commit stability (0 disables) |
 | `WRITE_PARTITIONS` | `8` | concurrent JDBC connections per write (0 = leave as-is) |
 | `TRUNCATE_BEFORE_LOAD` | `true` | full-reload: clear targets first |
 | `LOADED_AT` | *(run time)* | override the batch load timestamp (UTC `yyyy-mm-dd hh:mm:ss.fff`) |
@@ -176,8 +176,13 @@ after the token expires is rejected.
 The notebook avoids this under `AUTH_MODE=aad_token` by splitting any table above
 `MAX_ROWS_PER_WRITE` into deterministic hash chunks and **re-acquiring a fresh
 token before each chunk**, so no single connection outlives its token. Chunks are
-keyed by a row hash, so a source re-scan never duplicates or drops rows. Tune
-`MAX_ROWS_PER_WRITE` down if a chunk still approaches the token lifetime.
+keyed by a row hash, so a source re-scan never duplicates or drops rows. The hashed
+frame is persisted (`DISK_ONLY`) and materialized once, so each chunk reads from
+cache instead of recomputing the (often expensive) source join per chunk. Tune
+`MAX_ROWS_PER_WRITE` down if a chunk still approaches the token lifetime or if a
+constrained Azure SQL tier drops the connection at chunk-commit under load — a
+smaller chunk commits sooner and keeps the per-write pressure low (this is why the
+default is a modest 1M rather than a multi-million-row chunk).
 
 `AUTH_MODE=sql` (Key Vault password) has no token to expire and needs no
 chunking — prefer it if SQL authentication is enabled on the server.
