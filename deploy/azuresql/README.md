@@ -91,6 +91,12 @@ bulk-writes to Azure SQL in **foreign-key-safe order**.
 
 ### Parameters (env vars / notebook parameters)
 
+The first code cell is tagged `parameters`, so every value below can be set as a
+Fabric notebook/job **parameter** (or an environment variable). Derived values
+(`JDBC_URL`, the `ONLY_TABLES` list, the batch `LOADED_AT`) are computed in the
+cell immediately after, so injected overrides take effect. `AZURE_SQL_SERVER`
+and `AZURE_SQL_DATABASE` must be supplied — the run asserts on them.
+
 | Parameter | Default | Purpose |
 | --- | --- | --- |
 | `LAKEHOUSE_NAME` | `retail_lakehouse` | source lakehouse |
