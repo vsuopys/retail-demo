@@ -127,16 +127,37 @@ outside Terraform - it is never stored in state or committed:
 
 ```powershell
 $env:TF_VAR_mirror_sp_client_secret = "<sp client secret>"
-terraform apply -var-file="environments\dev.tfvars" -var="sql_mirroring_enabled=true" `
-  -var="mirror_sp_client_id=<app client id>"
+terraform apply -var-file="environments\dev.tfvars" -var="sql_mirroring_enabled=true"
 ```
 
 Non-secret source facts (`mirror_sql_server`, `mirror_sql_database`,
-`mirror_source_schema`) are set in `dev.tfvars`. The SP client id is not a secret
-but is left commented there; the secret must stay out of source control. Rotate
-the secret by incrementing `mirror_sp_client_secret_version` (write-only values
-are not diffable). After apply, wire bronze->silver shortcuts to
+`mirror_source_schema`), the SP `mirror_sp_client_id`, and
+`mirror_sql_server_identity_object_id` are set in `dev.tfvars` (client IDs and
+directory object IDs are not secrets). Only the SP secret stays out of source
+control. Rotate it by incrementing `mirror_sp_client_secret_version` (write-only
+values are not diffable). After apply, wire bronze->silver shortcuts to
 `mirrored_database_onelake_tables_path`.
+
+**Start mirroring (manual step).** Terraform creates the Mirrored Database in the
+`Initialized` state but does **not** start replication - the provider has no
+start argument, so starting is a deliberate manual/API action after apply (and
+after the source-side prerequisites are in place). Start it in the Fabric portal
+(open the mirrored database -> **Monitor/Configure** -> start), or via REST:
+
+```powershell
+$ws  = "<bronze workspace id>"          # terraform output workspace_ids["bronze"]
+$md  = "<mirrored database id>"          # terraform output mirrored_database_id
+$tok = az account get-access-token --resource "https://api.fabric.microsoft.com" --query accessToken -o tsv
+$h   = @{ Authorization = "Bearer $tok" }
+Invoke-RestMethod -Headers $h -Method Post `
+  -Uri "https://api.fabric.microsoft.com/v1/workspaces/$ws/mirroredDatabases/$md/startMirroring"
+# Check progress:
+Invoke-RestMethod -Headers $h -Method Post `
+  -Uri "https://api.fabric.microsoft.com/v1/workspaces/$ws/mirroredDatabases/$md/getMirroringStatus"
+```
+
+Changing `mirror_tables` on an already-running mirror requires stop ->
+re-apply/updateDefinition -> start (the table-list change re-seeds the snapshot).
 
 ## Outputs
 
