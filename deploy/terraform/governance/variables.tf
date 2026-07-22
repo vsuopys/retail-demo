@@ -115,6 +115,29 @@ variable "mirror_source_schema" {
   description = "Source schema to preserve as the mirrored database default schema (target defaultSchema). The retail OLTP tables live in the `retail` schema."
 }
 
+variable "mirror_tables" {
+  type = list(string)
+  default = [
+    "customers",
+    "distribution_centers",
+    "geographies",
+    "inventory_transactions",
+    "online_order_lines",
+    "online_orders",
+    "payments",
+    "products",
+    "reorders",
+    "sale_lines",
+    "sales",
+    "shipment_lines",
+    "shipment_movements",
+    "stockouts",
+    "stores",
+    "trucks",
+  ]
+  description = "Explicit list of source tables (in mirror_source_schema) to mirror. Defaults to the 16 business tables, deliberately excluding the retail._fk_backup bulk-load helper. Set to [] to mirror the WHOLE database instead (all tables, auto-adding new ones)."
+}
+
 variable "mirror_sp_client_id" {
   type        = string
   default     = null

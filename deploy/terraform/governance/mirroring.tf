@@ -22,6 +22,23 @@ locals {
 
   # Default the SP tenant to the stack tenant unless overridden.
   mirror_sp_tenant_id = coalesce(var.mirror_sp_tenant_id, var.tenant_id)
+
+  # When mirror_tables is empty, mirror the WHOLE database (mirroring.json omits
+  # mountedTables, so Fabric replicates every table and auto-adds new ones).
+  # When it lists tables, mirror only those (used to exclude non-business helper
+  # tables such as retail._fk_backup left over from the bulk load).
+  mirror_all_tables = length(var.mirror_tables) == 0
+
+  mounted_tables_json = jsonencode([
+    for t in var.mirror_tables : {
+      source = {
+        typeProperties = {
+          schemaName = var.mirror_source_schema
+          tableName  = t
+        }
+      }
+    }
+  ])
 }
 
 # Cloud connection to the source Azure SQL database. Credentials are Service
@@ -91,12 +108,15 @@ resource "fabric_mirrored_database" "sql_mirror" {
 
   definition = {
     "mirroring.json" = {
-      source = "${path.module}/mirroring/mirroring.json.tmpl"
-      tokens = {
-        ConnectionId  = fabric_connection.sql_mirror[0].id
-        Database      = var.mirror_sql_database
-        DefaultSchema = var.mirror_source_schema
-      }
+      source = local.mirror_all_tables ? "${path.module}/mirroring/mirroring.json.tmpl" : "${path.module}/mirroring/mirroring.tables.json.tmpl"
+      tokens = merge(
+        {
+          ConnectionId  = fabric_connection.sql_mirror[0].id
+          Database      = var.mirror_sql_database
+          DefaultSchema = var.mirror_source_schema
+        },
+        local.mirror_all_tables ? {} : { MountedTables = local.mounted_tables_json }
+      )
     }
   }
 

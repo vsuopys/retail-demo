@@ -19,7 +19,7 @@ succeeds with the old workspace absent.
 | 4 Lakehouses | One per layer (`bronze_lh`, `silver_lh`, `gold_lh`, `ds_lh`) - **empty**; each layer physically owns its tables (D2) |
 | Fabric domain | `Retail`, with the four workspaces assigned (preview resources) |
 | Workspace role assignments | Least-privilege RBAC matrix (below), groups only - never users |
-| Azure SQL mirroring (optional) | Connection + Mirrored Database in bronze (all tables), when `sql_mirroring_enabled` - see below |
+| Azure SQL mirroring (optional) | Connection + Mirrored Database in bronze (16 business tables by default), when `sql_mirroring_enabled` - see below |
 
 ### RBAC matrix
 
@@ -95,17 +95,19 @@ default.
 ## Optional: Azure SQL mirroring into bronze
 
 Set `sql_mirroring_enabled = true` to replicate the retail OLTP database (Azure
-SQL) into `retail-bronze-<env>` as a Fabric **Mirrored Database**. The **entire
-database is mirrored** - `mirroring/mirroring.json.tmpl` omits `mountedTables`,
-so Fabric replicates every table and auto-adds new ones. Data lands in OneLake as
-Delta under the source schema (`mirror_source_schema`, default `retail`).
+SQL) into `retail-bronze-<env>` as a Fabric **Mirrored Database**. By default the
+**16 business tables** are mirrored (`mirror_tables`), deliberately **excluding**
+the `retail._fk_backup` bulk-load helper. Set `mirror_tables = []` to mirror the
+**whole database** instead (all tables, auto-adding new ones). Data lands in
+OneLake as Delta under the source schema (`mirror_source_schema`, default
+`retail`).
 
 Resources created when enabled (`mirroring.tf`):
 
 | Resource | Detail |
 |----------|--------|
 | `fabric_connection.sql_mirror` | Cloud connection (`type = SQL`) to `mirror_sql_server` / `mirror_sql_database`, Service Principal auth |
-| `fabric_mirrored_database.sql_mirror` | Mirrored Database item in the bronze workspace, all tables, Delta |
+| `fabric_mirrored_database.sql_mirror` | Mirrored Database item in the bronze workspace, `mirror_tables` (default 16 business tables; excludes `retail._fk_backup`), Delta |
 | `fabric_workspace_role_assignment.sql_server_identity` | Optional - grants the SQL server managed identity `Contributor` on bronze (only when `mirror_sql_server_identity_object_id` is set) |
 
 **Source-side prerequisites** (not managed by Terraform - Fabric mirroring
